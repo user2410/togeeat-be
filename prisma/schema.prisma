@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserInformation {
+  id              Int      @id @default(autoincrement()) @map("user_id")
+  name            String   @default("")
+  age             Int      @default(18)
+  description     String   @default("")
+  avatar          String   @default("")
+  phone           String   @default("")
+  backgroundImage String   @default("") @map("background_image")
+  address         String   @default("")
+  nationality     String   @default("")
+  languageSkills  String   @default("") @map("language_skills")
+  isPublic        Boolean  @default(false)
+  account         Account?
+
+  user_matchings UserMatching[]
+  ReviewUser1    ReviewUser[]   @relation("User1_ReviewUser")
+  ReviewUser2    ReviewUser[]   @relation("User2_ReviewUser")
+  UserHobby      UserHobby[]
+  MessageUser1   Message[]      @relation("User1_Message")
+  MessageUser2   Message[]      @relation("User2_Message")
+
+  @@map("user_information")
+}
+
+model Account {
+  id        Int      @id @default(autoincrement())
+  user_id   Int      @unique
+  email     String   @unique
+  password  String
+  isAdmin   Boolean  @default(false) @map("is_admin")
+  isBanned  Boolean  @default(false) @map("is_banned")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user UserInformation @relation(fields: [user_id], references: [id])
+
+  @@map("account")
+}
+
+model MatchingStatus {
+  id                 Int            @id @default(autoincrement())
+  status             Boolean        @default(false)
+  address            String         @default("")
+  matchingDate       DateTime       @default(now()) @map(name: "matching_date")
+  desiredFood        String         @default("") @map(name: "desired_food")
+  conversationTopics String         @default("") @map(name: "conversation_topics")
+  matchingType       Boolean        @default(false) @map(name: "matching_type")
+  createdAt          DateTime       @default(now()) @map(name: "created_at")
+  updatedAt          DateTime       @updatedAt @map(name: "updated_at")
+  userMatchings      UserMatching[]
+
+  @@map("matching_status")
+}
+
+model UserMatching {
+  userId     Int @map(name: "user_id")
+  matchingId Int @map(name: "matching_id")
+
+  user     UserInformation @relation(fields: [userId], references: [id])
+  matching MatchingStatus  @relation(fields: [matchingId], references: [id])
+
+  @@id([userId, matchingId])
+  @@map(name: "user_matching")
+}
+
+model ReviewUser {
+  id              Int      @id @default(autoincrement()) @map(name: "comment_id")
+  user1Id         Int      @map(name: "user1_id")
+  user2Id         Int      @map(name: "user2_id")
+  parentCommentId Int?     @map(name: "parent_comment_id")
+  content         String
+  star            Int      @default(0)
+  createdAt       DateTime @default(now()) @map(name: "created_at")
+  updatedAt       DateTime @updatedAt @map(name: "updated_at")
+
+  user1          UserInformation @relation("User1_ReviewUser", fields: [user1Id], references: [id])
+  user2          UserInformation @relation("User2_ReviewUser", fields: [user2Id], references: [id])
+  parentComment  ReviewUser?     @relation("Parent_Comments", fields: [parentCommentId], references: [id])
+  parentComments ReviewUser[]    @relation("Parent_Comments")
+
+  @@map(name: "review_user")
+}
+
+model UserHobby {
+  userId  Int @map(name: "user_id")
+  hobbyId Int @map(name: "hobby_id")
+
+  user  UserInformation @relation(fields: [userId], references: [id])
+  hobby Hobby           @relation(fields: [hobbyId], references: [id])
+
+  @@id([userId, hobbyId])
+  @@map(name: "user_hobbies")
+}
+
+model Hobby {
+  id        Int      @id @default(autoincrement()) @map(name: "id")
+  name      String   @default("") @map(name: "name")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  userHobbies UserHobby[]
+
+  @@map(name: "hobbies")
+}
+
+model Message {
+  id           Int             @id @default(autoincrement()) @map(name: "id")
+  user1Id      Int             @map(name: "user1_id")
+  user2Id      Int             @map(name: "user2_id")
+  createdAt    DateTime        @default(now()) @map(name: "created_at")
+  updatedAt    DateTime        @updatedAt @map(name: "updated_at")
+  content      String          @map(name: "content")
+  user1        UserInformation @relation("User1_Message", fields: [user1Id], references: [id])
+  user2        UserInformation @relation("User2_Message", fields: [user2Id], references: [id])
+  directImages DirectImage[]
+
+  @@map(name: "messages")
+}
+
+model DirectImage {
+  id        Int      @id @default(autoincrement())
+  messageId Int      @map(name: "message_id")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  imageLink String   @map(name: "image_link")
+  message   Message  @relation(fields: [messageId], references: [id])
+
+  @@map(name: "direct_images")
+}
