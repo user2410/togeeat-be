@@ -4,11 +4,9 @@
 Backend API of Togeeat web app
 
 ## Installation
-- Dependencies:
-```bash
-$ yarn install
-```
+- Dependencies: `npm install` or `yarn install`
 - Fill environment fields in '.env' file
+- Run `npx prisma generate` or `yarn prisma generate` to apply migrations and generate prisma client
 
 ## Running the app
 

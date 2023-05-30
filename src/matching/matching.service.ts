@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SearchQueryDto } from '@/common/pipes/search-query.pipe';
 import { MatchingStatus } from '@prisma/client';
 import { PaginationDto } from '@/common/dto/pagination.dto';
+import { MatchingEntity } from './entities/matching.entity';
 
 @Injectable()
 export class MatchingService {
@@ -13,7 +14,7 @@ export class MatchingService {
   constructor(private prisma: PrismaService) { }
 
   async create(data: CreateMatchingDto) {
-    return await this.prisma.matchingStatus.create({
+    return await this.prisma.matching.create({
       data
     });
   }
@@ -24,9 +25,9 @@ export class MatchingService {
       sortParam[sort] = order;
     }
     const res = await this.prisma.$transaction([
-      this.prisma.matchingStatus.count({ where: { status: true } }),
-      this.prisma.matchingStatus.findMany({
-        where: { status: true },
+      this.prisma.matching.count({ where: { status: MatchingStatus.OPEN } }),
+      this.prisma.matching.findMany({
+        where: { status: MatchingStatus.OPEN },
         orderBy: sortParam,
         skip: offset ? offset : 10,
         take: limit ? limit : 10,
@@ -36,8 +37,8 @@ export class MatchingService {
     return new PaginationDto(res[0], res[1]);
   }
 
-  async findOne(id: number): Promise<MatchingStatus> {
-    return await this.prisma.matchingStatus.findFirst({
+  async findOne(id: number): Promise<MatchingEntity> {
+    return await this.prisma.matching.findFirst({
       where: { id }
     })
   }
@@ -46,8 +47,15 @@ export class MatchingService {
   //   return `This action updates a #${id} matching`;
   // }
 
+  async updateStatus(id: number): Promise<void> {
+    await this.prisma.matching.update({
+      where: { id },
+      data: { status: MatchingStatus.CLOSED }
+    })
+  }
+
   async remove(id: number): Promise<void> {
-    this.prisma.matchingStatus.delete({
+    this.prisma.matching.delete({
       where: { id }
     });
   }

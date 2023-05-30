@@ -1,14 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsDate, IsNotEmpty, IsString } from "class-validator";
+import { MatchingStatus, MatchingType } from "@prisma/client";
+import { IsDate, IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class MatchingEntity {
 	@ApiProperty()
 	id: number;
 
 	@ApiProperty({
-		description: 'false: open (default), true: close',
+		description: 'possible values: OPEN, CLOSED',
+		example: 'OPEN',
 	})
-	status: boolean;
+	@IsString() @IsEnum(MatchingStatus)
+	status: MatchingStatus;
 
 	@ApiProperty()
 	@IsString()
@@ -27,9 +30,12 @@ export class MatchingEntity {
 	@IsString()
 	conversationTopics: string;
 
-	@ApiProperty()
-	@IsBoolean()
-	matchingType: boolean;
+	@ApiProperty({
+		description: 'possible values: QUICK, YOTEI',
+		example: 'QUICK',
+	})
+	@IsString() @IsEnum(MatchingType)
+	matchingType: MatchingType;
 
 	@ApiProperty()
 	createdAt: Date;

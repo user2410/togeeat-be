@@ -1,14 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, Query, NotFoundException, UseFilters } from '@nestjs/common';
-import { MatchingService } from './matching.service';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseFilters, UsePipes } from '@nestjs/common';
 import { CreateMatchingDto } from './dto/create-matching.dto';
+import { MatchingService } from './matching.service';
 // import { UpdateMatchingDto } from './dto/update-matching.dto';
-import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pipe';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { MatchingEntity } from './entities/matching.entity';
-import { MatchingStatus } from '@prisma/client';
-import { PrismaClientValidationExceptionFilter } from '@/prisma-client-exception/prisma-client-exception.filter';
 import { PaginationDto } from '@/common/dto/pagination.dto';
+import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pipe';
+import { PrismaClientValidationExceptionFilter } from '@/prisma-client-exception/prisma-client-exception.filter';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MatchingPaginationDto } from './dto/pagination.dto';
+import { MatchingEntity } from './entities/matching.entity';
 
 
 @Controller('matching')
@@ -34,8 +33,9 @@ export class MatchingController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a matching by id' })
   @ApiOkResponse({ type: MatchingEntity })
-  async findOne(@Param('id') id: number): Promise<MatchingStatus> {
+  async findOne(@Param('id') id: number): Promise<MatchingEntity> {
     const matching = this.matchingService.findOne(+id);
     if (!matching) {
       throw new NotFoundException(`Matching with id=${id} not found`);
@@ -49,7 +49,15 @@ export class MatchingController {
   //   return await this.matchingService.update(+id, updateMatchingDto);
   // }
 
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update matching status to CLOSED, executed by priviledged services only' })
+  @ApiOkResponse()
+  async update(@Param('id') id: string): Promise<void> {
+    return await this.matchingService.updateStatus(+id);
+  }
+
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a matching' })
   @ApiOkResponse()
   async remove(@Param('id') id: number): Promise<void> {
     return await this.matchingService.remove(+id);

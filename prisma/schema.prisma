@@ -24,12 +24,12 @@ model UserInformation {
   isPublic        Boolean  @default(false)
   account         Account?
 
-  user_matchings UserMatching[]
-  ReviewUser1    ReviewUser[]   @relation("User1_ReviewUser")
-  ReviewUser2    ReviewUser[]   @relation("User2_ReviewUser")
-  UserHobby      UserHobby[]
-  MessageUser1   Message[]      @relation("User1_Message")
-  MessageUser2   Message[]      @relation("User2_Message")
+  UserMatchings UserMatching[]
+  ReviewUser1   ReviewUser[]   @relation("User1_ReviewUser")
+  ReviewUser2   ReviewUser[]   @relation("User2_ReviewUser")
+  UserHobby     UserHobby[]
+  MessageUser1  Message[]      @relation("User1_Message")
+  MessageUser2  Message[]      @relation("User2_Message")
 
   @@map("user_information")
 }
@@ -46,22 +46,32 @@ model Account {
 
   user UserInformation @relation(fields: [user_id], references: [id])
 
-  @@map("account")
+  @@map("accounts")
 }
 
-model MatchingStatus {
+enum MatchingStatus {
+  OPEN
+  CLOSED
+}
+
+enum MatchingType {
+  QUICK
+  YOTEI
+}
+
+model Matching {
   id                 Int            @id @default(autoincrement())
-  status             Boolean        @default(false)
+  status             MatchingStatus @default(OPEN)
   address            String         @default("")
   matchingDate       DateTime       @default(now()) @map(name: "matching_date")
   desiredFood        String         @default("") @map(name: "desired_food")
   conversationTopics String         @default("") @map(name: "conversation_topics")
-  matchingType       Boolean        @default(false) @map(name: "matching_type")
+  matchingType       MatchingType   @default(QUICK) @map(name: "matching_type")
   createdAt          DateTime       @default(now()) @map(name: "created_at")
   updatedAt          DateTime       @updatedAt @map(name: "updated_at")
   userMatchings      UserMatching[]
 
-  @@map("matching_status")
+  @@map("matchings")
 }
 
 model UserMatching {
@@ -69,7 +79,7 @@ model UserMatching {
   matchingId Int @map(name: "matching_id")
 
   user     UserInformation @relation(fields: [userId], references: [id])
-  matching MatchingStatus  @relation(fields: [matchingId], references: [id])
+  matching Matching        @relation(fields: [matchingId], references: [id])
 
   @@id([userId, matchingId])
   @@map(name: "user_matching")
