@@ -49,6 +49,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "29.3.1",
+    "jest-mock-extended": "^3.0.4",
     "prettier": "^2.3.2",
     "prisma": "^4.14.1",
     "source-map-support": "^0.5.20",
@@ -74,6 +75,15 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ],
+    "testEnvironment": "node",
+    "clearMocks": true,
+    "preset": "ts-jest",
+    "moduleNameMapper": {
+      "@/(.*)$": "<rootDir>/$1"
+    }
   }
 }

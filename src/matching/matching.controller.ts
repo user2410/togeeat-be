@@ -18,7 +18,7 @@ export class MatchingController {
   @Post()
   @ApiOperation({ summary: 'Create a new matching record' })
   @ApiCreatedResponse({ type: MatchingEntity })
-  async create(@Body() createMatchingDto: CreateMatchingDto) {
+  async create(@Body() createMatchingDto: CreateMatchingDto): Promise<MatchingEntity> {
     return this.matchingService.create(createMatchingDto);
   }
 
@@ -36,11 +36,11 @@ export class MatchingController {
   @ApiOperation({ summary: 'Get a matching by id' })
   @ApiOkResponse({ type: MatchingEntity })
   async findOne(@Param('id') id: number): Promise<MatchingEntity> {
-    const matching = this.matchingService.findOne(+id);
+    const matching = await this.matchingService.findOne(+id);
     if (!matching) {
       throw new NotFoundException(`Matching with id=${id} not found`);
     }
-    return matching;
+    return matching!;
   }
 
   // @Patch(':id')

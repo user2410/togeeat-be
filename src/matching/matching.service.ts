@@ -1,46 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateMatchingDto } from './dto/create-matching.dto';
-// import { UpdateMatchingDto } from './dto/update-matching.dto';
-// import { Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { SearchQueryDto } from '@/common/pipes/search-query.pipe';
-import { MatchingStatus } from '@prisma/client';
 import { PaginationDto } from '@/common/dto/pagination.dto';
+import { SearchQueryDto } from '@/common/pipes/search-query.pipe';
 import { MatchingEntity } from './entities/matching.entity';
+import { MatchingRepository } from './matching.repository';
 
+/**
+ * Service layer may do other things... e.g. send email of add a CPU-heavy task to a queue 
+ */
 @Injectable()
 export class MatchingService {
 
-  constructor(private prisma: PrismaService) { }
+  // constructor(private prisma: PrismaService) { }
+  constructor(private repository: MatchingRepository) { }
 
   async create(data: CreateMatchingDto) {
-    return await this.prisma.matching.create({
-      data
-    });
-  }
-
-  async listActive({ limit, offset, sort, order }: SearchQueryDto): Promise<PaginationDto> {
-    const sortParam = {};
-    if (sort) {
-      sortParam[sort] = order;
+    if (data.matchingDate.valueOf() < (new Date()).valueOf()) {
+      throw new BadRequestException({ message: 'Invalid matching date' });
     }
-    const res = await this.prisma.$transaction([
-      this.prisma.matching.count({ where: { status: MatchingStatus.OPEN } }),
-      this.prisma.matching.findMany({
-        where: { status: MatchingStatus.OPEN },
-        orderBy: sortParam,
-        skip: offset ? offset : 10,
-        take: limit ? limit : 10,
-      }),
-    ]);
-
-    return new PaginationDto(res[0], res[1]);
+    return await this.repository.create(data);
   }
 
-  async findOne(id: number): Promise<MatchingEntity> {
-    return await this.prisma.matching.findFirst({
-      where: { id }
-    })
+  async listActive(query: SearchQueryDto): Promise<PaginationDto> {
+    return this.repository.listActive(query);
+  }
+
+  async findOne(id: number): Promise<MatchingEntity | null> {
+    return await this.repository.findOne(id);
   }
 
   // async update(id: number, updateMatchingDto: UpdateMatchingDto) {
@@ -48,15 +34,10 @@ export class MatchingService {
   // }
 
   async updateStatus(id: number): Promise<void> {
-    await this.prisma.matching.update({
-      where: { id },
-      data: { status: MatchingStatus.CLOSED }
-    })
+    await this.repository.updateStatus(id);
   }
 
   async remove(id: number): Promise<void> {
-    this.prisma.matching.delete({
-      where: { id }
-    });
+    this.repository.delete(id);
   }
 }
