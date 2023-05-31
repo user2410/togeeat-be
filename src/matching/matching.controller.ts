@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseFilters, UsePipes } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseFilters, UsePipes } from '@nestjs/common';
 import { CreateMatchingDto } from './dto/create-matching.dto';
 import { MatchingService } from './matching.service';
 // import { UpdateMatchingDto } from './dto/update-matching.dto';
@@ -19,6 +19,9 @@ export class MatchingController {
   @ApiOperation({ summary: 'Create a new matching record' })
   @ApiCreatedResponse({ type: MatchingEntity })
   async create(@Body() createMatchingDto: CreateMatchingDto): Promise<MatchingEntity> {
+    if (createMatchingDto.matchingDate.valueOf() < (new Date()).valueOf()) {
+      throw new BadRequestException({ message: 'Invalid matching date' });
+    }
     return this.matchingService.create(createMatchingDto);
   }
 

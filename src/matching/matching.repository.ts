@@ -1,10 +1,10 @@
-import { PrismaService } from "../prisma/prisma.service";
 import { Injectable } from "@nestjs/common";
-import { CreateMatchingDto } from "./dto/create-matching.dto";
-import { MatchingEntity } from "./entities/matching.entity";
+import { MatchingStatus } from "@prisma/client";
 import { PaginationDto } from "../common/dto/pagination.dto";
 import { SearchQueryDto } from "../common/pipes/search-query.pipe";
-import { MatchingStatus } from "@prisma/client";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateMatchingDto } from "./dto/create-matching.dto";
+import { MatchingEntity } from "./entities/matching.entity";
 
 @Injectable()
 export class MatchingRepository {
@@ -14,18 +14,14 @@ export class MatchingRepository {
 		return this.prisma.matching.create({ data });
 	}
 
-	async listActive({ limit, offset, sort, order }: SearchQueryDto): Promise<PaginationDto> {
-		const sortParam = {};
-		if (sort) {
-			sortParam[sort] = order;
-		}
+	async listActive({ limit, offset }: SearchQueryDto, sortParam: object): Promise<PaginationDto> {
 		const res = await this.prisma.$transaction([
 			this.prisma.matching.count({ where: { status: MatchingStatus.OPEN } }),
 			this.prisma.matching.findMany({
 				where: { status: MatchingStatus.OPEN },
 				orderBy: sortParam,
-				skip: offset ? offset : 10,
-				take: limit ? limit : 10,
+				skip: offset,
+				take: limit,
 			}),
 		]);
 		return new PaginationDto(res[0], res[1]);
@@ -37,10 +33,10 @@ export class MatchingRepository {
 		})
 	}
 
-	async updateStatus(id: number): Promise<void> {
+	async updateStatus(id: number, status: MatchingStatus): Promise<void> {
 		await this.prisma.matching.update({
 			where: { id },
-			data: { status: MatchingStatus.CLOSED }
+			data: { status }
 		})
 	}
 

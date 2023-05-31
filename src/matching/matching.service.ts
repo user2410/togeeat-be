@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateMatchingDto } from './dto/create-matching.dto';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 import { SearchQueryDto } from '@/common/pipes/search-query.pipe';
+import { Injectable } from '@nestjs/common';
+import { MatchingStatus } from '@prisma/client';
+import { CreateMatchingDto } from './dto/create-matching.dto';
 import { MatchingEntity } from './entities/matching.entity';
 import { MatchingRepository } from './matching.repository';
 
@@ -15,14 +16,17 @@ export class MatchingService {
   constructor(private repository: MatchingRepository) { }
 
   async create(data: CreateMatchingDto) {
-    if (data.matchingDate.valueOf() < (new Date()).valueOf()) {
-      throw new BadRequestException({ message: 'Invalid matching date' });
-    }
     return await this.repository.create(data);
   }
 
   async listActive(query: SearchQueryDto): Promise<PaginationDto> {
-    return this.repository.listActive(query);
+    query.limit = query.limit ? query.limit : 10;
+    query.offset = query.offset ? query.offset : 0;
+    const sortParam = {};
+    if (query.sort) {
+      sortParam[query.sort] = query.order;
+    }
+    return this.repository.listActive(query, sortParam);
   }
 
   async findOne(id: number): Promise<MatchingEntity | null> {
@@ -34,7 +38,7 @@ export class MatchingService {
   // }
 
   async updateStatus(id: number): Promise<void> {
-    await this.repository.updateStatus(id);
+    await this.repository.updateStatus(id, MatchingStatus.CLOSED);
   }
 
   async remove(id: number): Promise<void> {

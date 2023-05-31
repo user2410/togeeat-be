@@ -6,8 +6,8 @@ import { MatchingRepository } from './matching.repository';
 
 @Module({
   controllers: [MatchingController],
-  providers: [MatchingService, MatchingRepository],
+  imports: [PrismaModule],
+  providers: [MatchingRepository, MatchingService],
   exports: [MatchingService],
-  imports: [PrismaModule]
 })
 export class MatchingModule { }
