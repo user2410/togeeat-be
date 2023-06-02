@@ -52,13 +52,6 @@ export class MatchingController {
   //   return await this.matchingService.update(+id, updateMatchingDto);
   // }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update matching status to CLOSED, executed by priviledged services only' })
-  @ApiOkResponse()
-  async update(@Param('id') id: string): Promise<void> {
-    return await this.matchingService.updateStatus(+id);
-  }
-
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a matching' })
   @ApiOkResponse()

@@ -33,11 +33,14 @@ export class MatchingRepository {
 		})
 	}
 
-	async updateStatus(id: number, status: MatchingStatus): Promise<void> {
-		await this.prisma.matching.update({
-			where: { id },
-			data: { status }
-		})
+	async updateStatus(): Promise<void> {
+		await this.prisma.matching.updateMany({
+			where: {
+				matchingDate: { lte: new Date() },
+				status: MatchingStatus.OPEN,
+			},
+			data: { status: MatchingStatus.CLOSED }
+		});
 	}
 
 	async delete(id: number): Promise<void> {

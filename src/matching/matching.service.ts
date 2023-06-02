@@ -5,6 +5,7 @@ import { MatchingStatus } from '@prisma/client';
 import { CreateMatchingDto } from './dto/create-matching.dto';
 import { MatchingEntity } from './entities/matching.entity';
 import { MatchingRepository } from './matching.repository';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 /**
  * Service layer may do other things... e.g. send email of add a CPU-heavy task to a queue 
@@ -37,8 +38,10 @@ export class MatchingService {
   //   return `This action updates a #${id} matching`;
   // }
 
-  async updateStatus(id: number): Promise<void> {
-    await this.repository.updateStatus(id, MatchingStatus.CLOSED);
+  @Cron(CronExpression.EVERY_MINUTE)
+  async updateStatus() {
+    console.log('Updating matching status');
+    await this.repository.updateStatus();
   }
 
   async remove(id: number): Promise<void> {
