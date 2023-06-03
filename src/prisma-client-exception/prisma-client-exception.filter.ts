@@ -4,10 +4,11 @@ import { Response } from 'express';
 
 function prepareResponse(exception: Error, host: ArgumentsHost) {
   const ctx = host.switchToHttp();
+  const messages = exception.message.split('\n');
   return {
     ctx,
     response: ctx.getResponse<Response>(),
-    message: exception.message.replace(/\n/g, ''),
+    message: messages[messages.length - 1],
   }
 }
 
@@ -19,7 +20,7 @@ export class PrismaClientKnownRequestExceptionFilter implements ExceptionFilter 
     let status;
 
     switch (exception.code) {
-      case 'P2002':
+      case 'P2002': case 'P2003':
         status = HttpStatus.CONFLICT;
         break;
       default:

@@ -11,19 +11,20 @@ datasource db {
 }
 
 model UserInformation {
-  id              Int      @id @default(autoincrement()) @map("user_id")
-  name            String   @default("")
-  age             Int      @default(18)
-  description     String   @default("")
-  avatar          String   @default("")
-  phone           String   @default("")
-  backgroundImage String   @default("") @map("background_image")
-  address         String   @default("")
-  nationality     String   @default("")
-  languageSkills  String   @default("") @map("language_skills")
-  isPublic        Boolean  @default(false)
-  account         Account?
+  id              Int     @id @default(autoincrement())
+  accountId       Int     @unique
+  name            String  @default("")
+  age             Int     @default(18)
+  description     String  @default("")
+  avatar          String  @default("")
+  phone           String  @default("")
+  backgroundImage String  @default("") @map("background_image")
+  address         String  @default("")
+  nationality     String  @default("")
+  languageSkills  String  @default("") @map("language_skills")
+  isPublic        Boolean @default(false)
 
+  account       Account        @relation(fields: [accountId], references: [id])
   UserMatchings UserMatching[]
   ReviewUser1   ReviewUser[]   @relation("User1_ReviewUser")
   ReviewUser2   ReviewUser[]   @relation("User2_ReviewUser")
@@ -36,7 +37,6 @@ model UserInformation {
 
 model Account {
   id        Int      @id @default(autoincrement())
-  user_id   Int      @unique
   email     String   @unique
   password  String
   isAdmin   Boolean  @default(false) @map("is_admin")
@@ -44,7 +44,7 @@ model Account {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user UserInformation @relation(fields: [user_id], references: [id])
+  user UserInformation?
 
   @@map("accounts")
 }
