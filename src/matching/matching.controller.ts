@@ -4,7 +4,7 @@ import { MatchingService } from './matching.service';
 // import { UpdateMatchingDto } from './dto/update-matching.dto';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pipe';
-import { PrismaClientValidationExceptionFilter } from '@/prisma-client-exception/prisma-client-exception.filter';
+import { PrismaClientValidationExceptionFilter } from '@/prisma/prisma-client-exception.filter';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MatchingPaginationDto } from './dto/pagination.dto';
 import { MatchingEntity } from './entities/matching.entity';

@@ -16,11 +16,11 @@ export class AccountEntity {
 
 	@ApiProperty()
 	@IsBoolean()
-	isAdmin?: boolean = false;
+	isAdmin: boolean;
 
 	@ApiProperty()
 	@IsBoolean()
-	isBanned?: boolean = false;
+	isBanned: boolean;
 
 	@ApiProperty()
 	createdAt: Date;

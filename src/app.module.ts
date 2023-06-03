@@ -4,8 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MatchingModule } from './matching/matching.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,8 +14,8 @@ import { UsersModule } from './users/users.module';
     }),
     ScheduleModule.forRoot(),
     MatchingModule,
-    AuthModule,
-    UsersModule],
+    UsersModule,
+    AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

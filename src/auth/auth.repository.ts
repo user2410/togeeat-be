@@ -18,4 +18,25 @@ export class AuthRepository {
 	async findById(id: number): Promise<AccountEntity | null> {
 		return await this.prisma.account.findFirst({ where: { id } });
 	}
+
+	async updatePassword(id: number, password: string): Promise<void> {
+		await this.prisma.account.update({
+			where: { id },
+			data: { password }
+		});
+	}
+
+	async updateRole(id: number, isAdmin: boolean): Promise<void> {
+		await this.prisma.account.update({
+			where: { id },
+			data: { isAdmin }
+		})
+	}
+
+	async updateBan(id: number, isBanned: boolean): Promise<void> {
+		await this.prisma.account.update({
+			where: { id },
+			data: { isBanned }
+		})
+	}
 }

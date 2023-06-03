@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entity/user.entity';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaClientKnownRequestExceptionFilter } from '@/prisma-client-exception/prisma-client-exception.filter';
+import { PrismaClientKnownRequestExceptionFilter } from '@/prisma/prisma-client-exception.filter';
 
 @Controller('users')
 @ApiTags('users')
