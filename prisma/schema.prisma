@@ -24,7 +24,8 @@ model UserInformation {
   languageSkills  String  @default("") @map("language_skills")
   isPublic        Boolean @default(false)
 
-  account       Account        @relation(fields: [accountId], references: [id])
+  account       Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  matching      Matching[]
   UserMatchings UserMatching[]
   ReviewUser1   ReviewUser[]   @relation("User1_ReviewUser")
   ReviewUser2   ReviewUser[]   @relation("User2_ReviewUser")
@@ -61,6 +62,7 @@ enum MatchingType {
 
 model Matching {
   id                 Int            @id @default(autoincrement())
+  ownerId            Int
   status             MatchingStatus @default(OPEN)
   address            String         @default("")
   matchingDate       DateTime       @default(now()) @map(name: "matching_date")
@@ -71,6 +73,8 @@ model Matching {
   updatedAt          DateTime       @updatedAt @map(name: "updated_at")
   userMatchings      UserMatching[]
 
+  owner UserInformation @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
   @@map("matchings")
 }
 
@@ -78,8 +82,8 @@ model UserMatching {
   userId     Int @map(name: "user_id")
   matchingId Int @map(name: "matching_id")
 
-  user     UserInformation @relation(fields: [userId], references: [id])
-  matching Matching        @relation(fields: [matchingId], references: [id])
+  user     UserInformation @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matching Matching        @relation(fields: [matchingId], references: [id], onDelete: Cascade)
 
   @@id([userId, matchingId])
   @@map(name: "user_matching")
@@ -95,8 +99,8 @@ model ReviewUser {
   createdAt       DateTime @default(now()) @map(name: "created_at")
   updatedAt       DateTime @updatedAt @map(name: "updated_at")
 
-  user1          UserInformation @relation("User1_ReviewUser", fields: [user1Id], references: [id])
-  user2          UserInformation @relation("User2_ReviewUser", fields: [user2Id], references: [id])
+  user1          UserInformation @relation("User1_ReviewUser", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2          UserInformation @relation("User2_ReviewUser", fields: [user2Id], references: [id], onDelete: Cascade)
   parentComment  ReviewUser?     @relation("Parent_Comments", fields: [parentCommentId], references: [id])
   parentComments ReviewUser[]    @relation("Parent_Comments")
 
@@ -107,8 +111,8 @@ model UserHobby {
   userId  Int @map(name: "user_id")
   hobbyId Int @map(name: "hobby_id")
 
-  user  UserInformation @relation(fields: [userId], references: [id])
-  hobby Hobby           @relation(fields: [hobbyId], references: [id])
+  user  UserInformation @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hobby Hobby           @relation(fields: [hobbyId], references: [id], onDelete: Cascade)
 
   @@id([userId, hobbyId])
   @@map(name: "user_hobbies")
@@ -132,8 +136,8 @@ model Message {
   createdAt    DateTime        @default(now()) @map(name: "created_at")
   updatedAt    DateTime        @updatedAt @map(name: "updated_at")
   content      String          @map(name: "content")
-  user1        UserInformation @relation("User1_Message", fields: [user1Id], references: [id])
-  user2        UserInformation @relation("User2_Message", fields: [user2Id], references: [id])
+  user1        UserInformation @relation("User1_Message", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2        UserInformation @relation("User2_Message", fields: [user2Id], references: [id], onDelete: Cascade)
   directImages DirectImage[]
 
   @@map(name: "messages")
@@ -145,7 +149,7 @@ model DirectImage {
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
   imageLink String   @map(name: "image_link")
-  message   Message  @relation(fields: [messageId], references: [id])
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@map(name: "direct_images")
 }

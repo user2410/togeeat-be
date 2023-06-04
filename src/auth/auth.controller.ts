@@ -1,11 +1,12 @@
 import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Patch, Post, Request, UnauthorizedException, UseFilters, UseGuards } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { ResAccountDto } from './dto/res_account.dto';
 import { PrismaClientKnownRequestExceptionFilter } from '@/prisma/prisma-client-exception.filter';
 import { CreateAccountDto } from './dto/create-account.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -52,15 +53,10 @@ export class AuthController {
 	}
 
 	@Patch('role/:id')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, AdminGuard)
 	@ApiOperation({ summary: 'Update role of other user' })
 	@ApiOkResponse()
 	async updatePermission(@Request() req, @Param() { id }, @Body() { newRole }: { newRole: string }) {
-		// check signed in user privillege
-		if (!req.user.isAdmin) {
-			throw new UnauthorizedException();
-		}
-
 		const account = await this.authService.getById(+id);
 		if (!account) {
 			throw new NotFoundException();
@@ -75,14 +71,9 @@ export class AuthController {
 	}
 
 	@Patch('ban/:id')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, AdminGuard)
 	@ApiOkResponse()
 	async updateBan(@Request() req, @Param() { id }, @Body() { isBanned }: { isBanned: string }) {
-		// check signed in user privillege
-		if (!req.user.isAdmin) {
-			throw new UnauthorizedException();
-		}
-
 		const account = await this.authService.getById(+id);
 		if (!account) {
 			throw new NotFoundException();

@@ -4,6 +4,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 	await prisma.matching.createMany({
 		data: [
 			{
+				ownerId: 1,
 				address: '123 Nguyen Van A Street, Ho Chi Minh City',
 				matchingDate: new Date('2023-06-15T09:30:00'),
 				desiredFood: 'Pho bo mam tom',

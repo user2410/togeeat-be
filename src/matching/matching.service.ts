@@ -16,8 +16,10 @@ export class MatchingService {
   // constructor(private prisma: PrismaService) { }
   constructor(private repository: MatchingRepository) { }
 
-  async create(data: CreateMatchingDto) {
-    return await this.repository.create(data);
+  async create(ownerId: number, data: CreateMatchingDto) {
+    const matching = await this.repository.create(ownerId, data);
+    await this.repository.addUserToMatching(matching.id, ownerId);
+    return matching;
   }
 
   async listActive(query: SearchQueryDto): Promise<PaginationDto> {
@@ -30,8 +32,22 @@ export class MatchingService {
     return this.repository.listActive(query, sortParam);
   }
 
+  async getMatchingsOfUser(userId: number, query: SearchQueryDto): Promise<PaginationDto> {
+    query.limit = query.limit ? query.limit : 10;
+    query.offset = query.offset ? query.offset : 0;
+    return await this.repository.getMatchingOfUser(userId, query);
+  }
+
   async findOne(id: number): Promise<MatchingEntity | null> {
     return await this.repository.findOne(id);
+  }
+
+  async joinUser(matchingId: number, userId: number) {
+    await this.repository.addUserToMatching(matchingId, userId);
+  }
+
+  async removeUser(matchingId: number, userId: number) {
+    await this.repository.removeUserFromMatching(matchingId, userId);
   }
 
   // async update(id: number, updateMatchingDto: UpdateMatchingDto) {
@@ -45,6 +61,6 @@ export class MatchingService {
   }
 
   async remove(id: number): Promise<void> {
-    this.repository.delete(id);
+    await this.repository.delete(id);
   }
 }

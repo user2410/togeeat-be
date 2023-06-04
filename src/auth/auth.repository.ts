@@ -16,7 +16,10 @@ export class AuthRepository {
 	}
 
 	async findById(id: number): Promise<AccountEntity | null> {
-		return await this.prisma.account.findFirst({ where: { id } });
+		return await this.prisma.account.findFirst({
+			where: { id },
+			include: { user: true }
+		});
 	}
 
 	async updatePassword(id: number, password: string): Promise<void> {

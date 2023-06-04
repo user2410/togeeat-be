@@ -10,8 +10,14 @@ import { MatchingEntity } from "./entities/matching.entity";
 export class MatchingRepository {
 	constructor(private prisma: PrismaService) { }
 
-	async create(data: CreateMatchingDto): Promise<MatchingEntity> {
-		return this.prisma.matching.create({ data });
+	async create(ownerId: number, data: CreateMatchingDto): Promise<MatchingEntity> {
+		console.log(ownerId, data);
+		return this.prisma.matching.create({
+			data: {
+				...data,
+				ownerId
+			}
+		});
 	}
 
 	async listActive({ limit, offset }: SearchQueryDto, sortParam: object): Promise<PaginationDto> {
@@ -27,10 +33,35 @@ export class MatchingRepository {
 		return new PaginationDto(res[0], res[1]);
 	}
 
+	async getMatchingOfUser(id: number, { limit, offset }: SearchQueryDto): Promise<PaginationDto> {
+		const res = await this.prisma.$transaction([
+			this.prisma.matching.count({ where: { ownerId: id } }),
+			this.prisma.matching.findMany({
+				where: { ownerId: id },
+				skip: offset,
+				take: limit,
+			}),
+		])
+		return new PaginationDto(res[0], res[1]);
+	}
+
 	async findOne(id: number): Promise<MatchingEntity | null> {
 		return await this.prisma.matching.findFirst({
-			where: { id }
+			where: { id },
+			include: { userMatchings: true }
 		})
+	}
+
+	async addUserToMatching(matchingId: number, userId: number) {
+		await this.prisma.userMatching.create({
+			data: { userId, matchingId }
+		});
+	}
+
+	async removeUserFromMatching(matchingId: number, userId: number) {
+		await this.prisma.userMatching.delete({
+			where: { userId_matchingId: { matchingId, userId } }
+		});
 	}
 
 	async updateStatus(): Promise<void> {
@@ -44,6 +75,6 @@ export class MatchingRepository {
 	}
 
 	async delete(id: number): Promise<void> {
-		this.prisma.matching.delete({ where: { id } })
+		await this.prisma.matching.delete({ where: { id } })
 	}
 }

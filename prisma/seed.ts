@@ -1,9 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import seedMatchings from "./seedings/matching";
+import seedUsers from "./seedings/user";
 
 const prisma = new PrismaClient();
 
 async function main() {
+	await seedUsers(prisma);
 	await seedMatchings(prisma);
 }
 

@@ -8,14 +8,25 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 export class UsersRepository {
 	constructor(private prisma: PrismaService) { }
 
-	async create(data: CreateUserDto): Promise<UserEntity | null> {
-		return await this.prisma.userInformation.create({ data });
+	async create(accountId: number, data: CreateUserDto): Promise<UserEntity | null> {
+		return await this.prisma.userInformation.create({
+			data: {
+				...data,
+				accountId
+			}
+		});
 	}
 
 	async getById(id: number): Promise<UserEntity | null> {
 		return await this.prisma.userInformation.findFirst({
 			where: { id },
 			include: { account: true }
+		})
+	}
+
+	async getByAccountId(accountId: number): Promise<UserEntity | null> {
+		return await this.prisma.userInformation.findFirst({
+			where: { accountId }
 		})
 	}
 

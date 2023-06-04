@@ -33,18 +33,18 @@ ALTER TABLE "user_matching" DROP CONSTRAINT "user_matching_user_id_fkey";
 DROP INDEX "account_user_id_key";
 
 -- AlterTable
-ALTER TABLE "accounts" RENAME CONSTRAINT "account_pkey" TO "accounts_pkey",
-DROP COLUMN "user_id";
+ALTER TABLE "accounts" RENAME CONSTRAINT "account_pkey" TO "accounts_pkey";
+ALTER TABLE "accounts" DROP COLUMN "user_id";
 
 -- AlterTable
 ALTER TABLE "matchings" RENAME CONSTRAINT "matching_status_pkey" TO "matchings_pkey";
 
 -- AlterTable
-ALTER TABLE "user_information" DROP CONSTRAINT "user_information_pkey",
-DROP COLUMN "user_id",
-ADD COLUMN     "accountId" INTEGER NOT NULL,
-ADD COLUMN     "id" SERIAL NOT NULL,
-ADD CONSTRAINT "user_information_pkey" PRIMARY KEY ("id");
+ALTER TABLE "user_information" DROP CONSTRAINT "user_information_pkey";
+ALTER TABLE "user_information" DROP COLUMN "user_id";
+ALTER TABLE "user_information" ADD COLUMN     "accountId" INTEGER NOT NULL;
+ALTER TABLE "user_information" ADD COLUMN     "id" SERIAL NOT NULL;
+ALTER TABLE "user_information" ADD CONSTRAINT "user_information_pkey" PRIMARY KEY ("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_information_accountId_key" ON "user_information"("accountId");
