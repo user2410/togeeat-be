@@ -56,7 +56,7 @@ export class MatchingService {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async updateStatus() {
-    console.log('Updating matching status');
+    // console.log('Updating matching status');
     await this.repository.updateStatus();
   }
 

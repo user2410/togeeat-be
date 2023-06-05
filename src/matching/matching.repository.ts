@@ -11,7 +11,7 @@ export class MatchingRepository {
 	constructor(private prisma: PrismaService) { }
 
 	async create(ownerId: number, data: CreateMatchingDto): Promise<MatchingEntity> {
-		console.log(ownerId, data);
+		// console.log(ownerId, data);
 		return this.prisma.matching.create({
 			data: {
 				...data,
