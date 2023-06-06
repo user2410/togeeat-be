@@ -6,31 +6,40 @@ export class SearchQueryDto {
 		public offset?: number,
 		public sort?: string,
 		public order?: string,
-		public origQueries?: object
+		public rest?: object
 	) { }
 }
 
 @Injectable()
-export class SearchQueryPipe implements PipeTransform<any> {
+export class SearchQueryPipe implements PipeTransform<any, SearchQueryDto> {
 	transform(value: any): SearchQueryDto {
-		const { _limit, _offset, _sort, _order, ...rest } = value;
-		const __limit = parseInt(_limit);
-		const __offset = parseInt(_offset);
+		const { limit, offset, sort, order, ...rest } = value;
 
-		if (_limit && _offset &&
-			(Number.isNaN(__limit) || __limit < 0 ||
-				Number.isNaN(__offset) || __offset < 0)) {
-			throw new BadRequestException(`Invalid pagination query offset=${_limit}, offset=${_offset}`);
+		const dto = new SearchQueryDto();
+
+		dto.limit = limit ? parseInt(limit, 10) : undefined;
+		dto.offset = offset ? parseInt(offset, 10) : undefined;
+		if (
+			Number.isNaN(dto.limit) ||
+			Number.isNaN(!dto.offset) ||
+			dto.limit as number < 0 ||
+			dto.offset as number < 0
+		) {
+			throw new BadRequestException(`invalid pagination query: limit=${limit}, offset=${offset}`);
 		}
 
-		if (_order && !/^(asc|desc)$/.test(_order)) {
-			throw new BadRequestException("_order must be 'asc' or 'desc'");
+		if (order && !/^(asc|desc)$/.test(order)) {
+			throw new BadRequestException("order must be 'asc' or 'desc'");
 		}
-
-		if ((_order && !_sort) || (!_order && _sort)) {
-			throw new BadRequestException("Sort field is required when order field is present");
+		if ((order && !sort) || (!order && sort)) {
+			throw new BadRequestException("sort field is required when order field is present");
 		}
+		dto.sort = sort;
+		dto.order = order;
 
-		return new SearchQueryDto(__limit, __offset, _sort, _order, rest);
+		delete rest['rest'];
+		dto.rest = rest;
+
+		return dto;
 	}
 }

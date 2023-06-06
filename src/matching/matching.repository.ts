@@ -20,24 +20,55 @@ export class MatchingRepository {
 		});
 	}
 
-	async listActive({ limit, offset }: SearchQueryDto, sortParam: object): Promise<PaginationDto> {
+	async list({ limit, offset, rest }: SearchQueryDto, sortParam: object): Promise<PaginationDto> {
 		const res = await this.prisma.$transaction([
-			this.prisma.matching.count({ where: { status: MatchingStatus.OPEN } }),
+			this.prisma.matching.count({ where: rest }),
 			this.prisma.matching.findMany({
-				where: { status: MatchingStatus.OPEN },
+				where: rest,
 				orderBy: sortParam,
 				skip: offset,
 				take: limit,
+				include: {
+					userMatchings: {
+						include: {
+							user: {
+								select: {
+									id: true,
+									name: true,
+									avatar: true,
+								}
+							}
+						},
+					}
+				}
 			}),
 		]);
 		return new PaginationDto(res[0], res[1]);
 	}
 
-	async getMatchingOfUser(id: number, { limit, offset }: SearchQueryDto): Promise<PaginationDto> {
+	async getMatchingsOfUser(id: number, { limit, offset }: SearchQueryDto): Promise<PaginationDto> {
 		const res = await this.prisma.$transaction([
-			this.prisma.matching.count({ where: { ownerId: id } }),
-			this.prisma.matching.findMany({
-				where: { ownerId: id },
+			this.prisma.userMatching.count({ where: { userId: id } }),
+			this.prisma.userMatching.findMany({
+				where: { userId: id },
+				include: {
+					matching: {
+						include: {
+							userMatchings: {
+								select: {
+									user: {
+										select: {
+											id: true,
+											name: true,
+											avatar: true,
+										}
+									}
+								}
+							}
+						}
+					},
+				},
+				orderBy: { matching: { createdAt: 'desc' } },
 				skip: offset,
 				take: limit,
 			}),

@@ -22,20 +22,22 @@ export class MatchingService {
     return matching;
   }
 
-  async listActive(query: SearchQueryDto): Promise<PaginationDto> {
+  async list(query: SearchQueryDto): Promise<PaginationDto> {
     query.limit = query.limit ? query.limit : 10;
     query.offset = query.offset ? query.offset : 0;
     const sortParam = {};
     if (query.sort) {
       sortParam[query.sort] = query.order;
+    } else {
+      sortParam['createdAt'] = 'desc';
     }
-    return this.repository.listActive(query, sortParam);
+    return this.repository.list(query, sortParam);
   }
 
   async getMatchingsOfUser(userId: number, query: SearchQueryDto): Promise<PaginationDto> {
     query.limit = query.limit ? query.limit : 10;
     query.offset = query.offset ? query.offset : 0;
-    return await this.repository.getMatchingOfUser(userId, query);
+    return await this.repository.getMatchingsOfUser(userId, query);
   }
 
   async findOne(id: number): Promise<MatchingEntity | null> {

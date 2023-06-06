@@ -32,11 +32,11 @@ export class MatchingController {
   @Get()
   @ApiOperation({ summary: 'List all matching records, response is paginated' })
   @ApiOkResponse({ type: [MatchingPaginationDto] })
-  @UsePipes(new SearchQueryPipe())
+  @UsePipes(SearchQueryPipe)
   @UseFilters(PrismaClientValidationExceptionFilter)
-  async listActive(@Query() query: SearchQueryDto): Promise<PaginationDto> {
+  async list(@Query() query: SearchQueryDto): Promise<PaginationDto> {
     // console.log(query);
-    return await this.matchingService.listActive(query);
+    return await this.matchingService.list(query);
   }
 
   @Get('my-matchings')
@@ -46,6 +46,12 @@ export class MatchingController {
   async getMyMatchings(@Request() req, @Query() query: SearchQueryDto): Promise<PaginationDto> {
     const currentUserId: number = req.user.userId;
     return await this.matchingService.getMatchingsOfUser(currentUserId, query);
+    // const res = result.items.map(item => {
+    //   return {
+    //     ...item.user,
+    //     item.
+    //   }
+    // })
   }
 
   @Get(':id')
