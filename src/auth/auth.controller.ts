@@ -39,7 +39,7 @@ export class AuthController {
 
 	@Get('profile')
 	@UseGuards(JwtAuthGuard)
-	@ApiOperation({ summary: 'Get currently signed in user' })
+	@ApiOperation({ summary: 'Get currently signed in user, along with associated user profile (if exists)' })
 	@ApiOkResponse()
 	getProfile(@Request() req) {
 		return req.user;
@@ -47,6 +47,7 @@ export class AuthController {
 
 	@Patch('password')
 	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Users update their own password' })
 	@ApiOkResponse()
 	async updatePassword(@Request() req, @Body() { newPassword }: { newPassword: string }) {
 		this.authService.updatePassword(req.user.id, newPassword);
@@ -54,7 +55,7 @@ export class AuthController {
 
 	@Patch('role/:id')
 	@UseGuards(JwtAuthGuard, AdminGuard)
-	@ApiOperation({ summary: 'Update role of other user' })
+	@ApiOperation({ summary: 'Admin update role of another user' })
 	@ApiOkResponse()
 	async updatePermission(@Request() req, @Param() { id }, @Body() { newRole }: { newRole: string }) {
 		const account = await this.authService.getById(+id);
@@ -72,6 +73,7 @@ export class AuthController {
 
 	@Patch('ban/:id')
 	@UseGuards(JwtAuthGuard, AdminGuard)
+	@ApiOperation({ summary: 'Admin restrict or lift restriction on another user' })
 	@ApiOkResponse()
 	async updateBan(@Request() req, @Param() { id }, @Body() { isBanned }: { isBanned: string }) {
 		const account = await this.authService.getById(+id);

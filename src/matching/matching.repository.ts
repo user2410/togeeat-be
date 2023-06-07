@@ -6,6 +6,12 @@ import { PrismaService } from "../prisma/prisma.service";
 import { CreateMatchingDto } from "./dto/create-matching.dto";
 import { MatchingEntity } from "./entities/matching.entity";
 
+const defaultSelectedUserInfo = {
+	id: true,
+	name: true,
+	avatar: true,
+};
+
 @Injectable()
 export class MatchingRepository {
 	constructor(private prisma: PrismaService) { }
@@ -29,15 +35,10 @@ export class MatchingRepository {
 				skip: offset,
 				take: limit,
 				include: {
+					owner: { select: defaultSelectedUserInfo },
 					userMatchings: {
 						include: {
-							user: {
-								select: {
-									id: true,
-									name: true,
-									avatar: true,
-								}
-							}
+							user: { select: defaultSelectedUserInfo }
 						},
 					}
 				}
@@ -56,13 +57,7 @@ export class MatchingRepository {
 						include: {
 							userMatchings: {
 								select: {
-									user: {
-										select: {
-											id: true,
-											name: true,
-											avatar: true,
-										}
-									}
+									user: { select: defaultSelectedUserInfo }
 								}
 							}
 						}

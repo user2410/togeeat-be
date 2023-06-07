@@ -1,5 +1,5 @@
 import { Body, ConflictException, Controller, Get, InternalServerErrorException, NotFoundException, Param, Patch, Post, Request, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entity/user.entity';
 import { UsersService } from './users.service';
@@ -16,6 +16,7 @@ export class UsersController {
 	@Post()
 	@UseGuards(JwtAuthGuard)
 	@UseFilters(PrismaClientKnownRequestExceptionFilter)
+	@ApiOperation({ summary: 'Create user profile associated with an account' })
 	async create(@Request() req, @Body() data: CreateUserDto): Promise<UserEntity> {
 		const user = await this.service.findByAccountId(req.user.id);
 		if (user) {
@@ -30,6 +31,7 @@ export class UsersController {
 	}
 
 	@Get(':id')
+	@ApiOperation({ summary: 'Get user information, include associated account information' })
 	async findById(@Param('id') id: number): Promise<UserEntity> {
 		const user = await this.service.findById(id);
 		if (!user) {
@@ -40,6 +42,7 @@ export class UsersController {
 	}
 
 	@Patch(':id')
+	@ApiOperation({ summary: 'Update user profile' })
 	async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
 		const user = await this.service.findById(+id);
 		if (!user) {
