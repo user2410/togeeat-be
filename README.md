@@ -4,11 +4,17 @@
 Backend API of Togeeat web app
 
 ## Installation
-- Dependencies: `npm install` or `yarn install`
-- Fill environment fields in '.env' file
+- Install dependencies: `npm install` or `yarn install`
+- Make a copy of .env.example: `cp .env.example .env`
+- Fill environment variables in '.env' file
 - Run `npx prisma generate` or `yarn prisma generate` to generate prisma client
 - Run `npx prisma migrate dev` or `yarn prisma migrate dev` to apply migrations
 
+## Build docker image
+- Make a copy of .env.example: `cp .env.example .env`
+- Fill environment variables in '.env' file
+- Build services `docker-compose --env-file .env build`
+- Run services `docker-compose --env-file .env up`
 
 ## Running the app
 
