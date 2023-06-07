@@ -6,17 +6,21 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   providers: [AuthRepository, AuthService, LocalStrategy, JwtStrategy],
   imports: [
     PrismaModule,
     PassportModule,
-    JwtModule.register({
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '3h' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule], // Import ConfigModule to access environment variables
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || 'mysecret',
+        signOptions: { expiresIn: configService.get<string>('JWT_ACCESS_TOKEN_DURATION') || '3h' },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
