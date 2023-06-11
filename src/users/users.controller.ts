@@ -1,5 +1,5 @@
 import { Body, ConflictException, Controller, Get, InternalServerErrorException, NotFoundException, Param, Patch, Post, Request, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entity/user.entity';
 import { UsersService } from './users.service';

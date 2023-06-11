@@ -1,13 +1,13 @@
-import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthRepository } from './auth.repository';
 import { PrismaModule } from '@/prisma/prisma.module';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
-import { LocalStrategy } from './strategies/local.strategy';
-import { JwtModule } from '@nestjs/jwt';
+import { AuthRepository } from './auth.repository';
+import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   providers: [AuthRepository, AuthService, LocalStrategy, JwtStrategy],
