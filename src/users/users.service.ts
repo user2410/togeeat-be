@@ -11,20 +11,15 @@ export class UsersService {
 
 	constructor(private repository: UsersRepository) { }
 
-	async create(accountId: number, data: CreateUserDto): Promise<UserEntity | null> {
+	async create(accountId: number, data: CreateUserDto): Promise<UserEntity> {
 		return await this.repository.create(accountId, data);
 	}
 
-	async findById(id: number): Promise<UserEntity | null> {
-		return await this.repository.getById(id);
-	}
-
-	async findByAccountId(id: number): Promise<UserEntity | null> {
-		return await this.repository.getByAccountId(id);
+	async findById(id: number, includeAccount: boolean = false): Promise<UserEntity | null> {
+		return await this.repository.getById(id, includeAccount);
 	}
 
 	async update(id: number, data: UpdateUserDto): Promise<UserEntity> {
-		delete data['accountId'];
 		return await this.repository.update(id, data);
 	}
 }

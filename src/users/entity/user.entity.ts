@@ -6,29 +6,26 @@ export class UserEntity {
 	id: number;
 
 	@ApiProperty()
-	@IsNumber()
-	@IsNotEmpty()
-	accountId: number;
-
-	@ApiProperty()
 	@IsString()
 	@IsNotEmpty()
 	name: string;
 
 	@ApiProperty()
 	@IsNumber()
+  @IsNotEmpty()
 	age: number;
 
 	@ApiProperty()
 	@IsString()
-	description: string;
+	description?: string;
 
 	@ApiProperty()
 	@IsUrl()
-	avatar: string;
+	avatar?: string;
 
 	@ApiProperty()
 	@IsPhoneNumber()
+  @IsNotEmpty()
 	phone: string;
 
 	@ApiProperty()
@@ -37,10 +34,12 @@ export class UserEntity {
 
 	@ApiProperty()
 	@IsString()
+  @IsNotEmpty()
 	address: string;
 
 	@ApiProperty()
 	@IsString()
+  @IsNotEmpty()
 	nationality: string;
 
 	@ApiProperty()

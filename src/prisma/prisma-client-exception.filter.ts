@@ -13,7 +13,7 @@ function prepareResponse(exception: Error, host: ArgumentsHost) {
 }
 
 @Catch(Prisma.PrismaClientKnownRequestError)
-export class PrismaClientKnownRequestExceptionFilter implements ExceptionFilter {
+export class PrismaKnownRequestExceptionFilter implements ExceptionFilter {
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     console.error(exception.message);
     const { response, message } = prepareResponse(exception, host);
@@ -36,7 +36,7 @@ export class PrismaClientKnownRequestExceptionFilter implements ExceptionFilter 
 }
 
 @Catch(Prisma.PrismaClientValidationError)
-export class PrismaClientValidationExceptionFilter implements ExceptionFilter {
+export class PrismaValidationExceptionFilter implements ExceptionFilter {
   catch(exception: Prisma.PrismaClientValidationError, host: ArgumentsHost) {
     console.error('[Exception]:', exception);
     const { response, message } = prepareResponse(exception, host);
@@ -53,7 +53,7 @@ export class PrismaClientValidationExceptionFilter implements ExceptionFilter {
   Prisma.PrismaClientInitializationError,
   Prisma.PrismaClientRustPanicError,
   Prisma.PrismaClientUnknownRequestError)
-export class PrismaClientInternalExceptionFilter implements ExceptionFilter {
+export class PrismaInternalExceptionFilter implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost) {
     console.error(exception.message);
     const { response, message } = prepareResponse(exception, host);

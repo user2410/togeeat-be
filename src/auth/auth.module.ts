@@ -8,9 +8,11 @@ import { AuthRepository } from './auth.repository';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { UsersService } from '@/users/users.service';
+import { UsersRepository } from '@/users/users.repository';
 
 @Module({
-  providers: [AuthRepository, AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthRepository, AuthService, UsersRepository, UsersService, LocalStrategy, JwtStrategy],
   imports: [
     PrismaModule,
     PassportModule,

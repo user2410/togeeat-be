@@ -3,7 +3,6 @@
 
 generator client {
   provider   = "prisma-client-js"
-  engineType = "binary"
 }
 
 datasource db {
@@ -12,8 +11,7 @@ datasource db {
 }
 
 model UserInformation {
-  id              Int     @id @default(autoincrement())
-  accountId       Int     @unique
+  id              Int     @id
   name            String  @default("")
   age             Int     @default(18)
   description     String  @default("")
@@ -25,7 +23,7 @@ model UserInformation {
   languageSkills  String  @default("") @map("language_skills")
   isPublic        Boolean @default(false)
 
-  account       Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account       Account        @relation(fields: [id], references: [id], onDelete: Cascade)
   matching      Matching[]
   UserMatchings UserMatching[]
   ReviewUser1   ReviewUser[]   @relation("User1_ReviewUser")

@@ -4,7 +4,7 @@ import { MatchingService } from './matching.service';
 // import { UpdateMatchingDto } from './dto/update-matching.dto';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pipe';
-import { PrismaClientValidationExceptionFilter } from '@/prisma/prisma-client-exception.filter';
+import { PrismaValidationExceptionFilter } from '@/prisma/prisma-client-exception.filter';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MatchingPaginationDto } from './dto/pagination.dto';
 import { MatchingEntity } from './entities/matching.entity';
@@ -33,7 +33,7 @@ export class MatchingController {
   @ApiOperation({ summary: 'List all matching records, response is paginated' })
   @ApiOkResponse({ type: [MatchingPaginationDto] })
   @UsePipes(SearchQueryPipe)
-  @UseFilters(PrismaClientValidationExceptionFilter)
+  @UseFilters(PrismaValidationExceptionFilter)
   async list(@Query() query: SearchQueryDto): Promise<PaginationDto> {
     // console.log(query);
     return await this.matchingService.list(query);
@@ -46,12 +46,6 @@ export class MatchingController {
   async getMyMatchings(@Request() req, @Query() query: SearchQueryDto): Promise<PaginationDto> {
     const currentUserId: number = req.user.userId;
     return await this.matchingService.getMatchingsOfUser(currentUserId, query);
-    // const res = result.items.map(item => {
-    //   return {
-    //     ...item.user,
-    //     item.
-    //   }
-    // })
   }
 
   @Get(':id')
@@ -73,7 +67,7 @@ export class MatchingController {
 
   @Patch('join/:id')
   @UseGuards(JwtAuthGuard, UserInfoGuard)
-  @UseFilters(PrismaClientValidationExceptionFilter)
+  @UseFilters(PrismaValidationExceptionFilter)
   @ApiOperation({ summary: 'Join current user to matching with id' })
   @ApiOkResponse()
   async joinMatching(@Request() req, @Param('id') id: string) {

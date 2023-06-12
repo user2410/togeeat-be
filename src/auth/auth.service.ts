@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from './auth.repository';
 import { CreateAccountDto } from './dto/create-account.dto';
-import { ResAccountDto } from './dto/res_account.dto';
+import { AccountWithoutPasswordDto } from './dto/res-account.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,14 +12,14 @@ export class AuthService {
 		private jwtService: JwtService
 	) { }
 
-	async signUp(data: CreateAccountDto): Promise<ResAccountDto> {
+	async signUp(data: CreateAccountDto): Promise<AccountWithoutPasswordDto> {
 		data.password = await hashPassword(data.password);
 		const newUser = await this.repository.create(data);
 		const { password, ...rest } = newUser;
 		return rest;
 	}
 
-	async validateUser(email: string, pass: string): Promise<ResAccountDto | null> {
+	async validateUser(email: string, pass: string): Promise<AccountWithoutPasswordDto | null> {
 		const account = await this.repository.findByEmail(email);
 		if (!account || !(await verifyPassword(pass, account.password))) {
 			return null;
@@ -28,16 +28,12 @@ export class AuthService {
 		return rest;
 	}
 
-	async signIn(account: any): Promise<{ accessToken: string; }> {
-		const payload = { sub: account.id, email: account.email };
-		return {
-			accessToken: await this.jwtService.signAsync(
-				payload,
-			),
-		};
+	async signIn(id: number, email: string): Promise<string> {
+		const payload = { sub: id, email: email };
+		return await this.jwtService.signAsync( payload );
 	}
 
-	async getById(id: number): Promise<ResAccountDto | null> {
+	async getById(id: number): Promise<AccountWithoutPasswordDto | null> {
 		const account = await this.repository.findById(id);
 		if (!account) {
 			return null;
