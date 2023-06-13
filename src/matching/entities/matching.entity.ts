@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { MatchingStatus, MatchingType, UserMatching } from "@prisma/client";
-import { IsDate, IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { MatchingType, UserMatching } from "@prisma/client";
+import { Type } from "class-transformer";
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 
 export class MatchingEntity {
 	@ApiProperty()
@@ -10,21 +11,22 @@ export class MatchingEntity {
 	@IsNotEmpty()
 	ownerId: number;
 
-	@ApiProperty({
-		description: 'possible values: OPEN, CLOSED',
-		example: 'OPEN',
-	})
-	@IsString() @IsEnum(MatchingStatus)
-	status: MatchingStatus;
-
 	@ApiProperty()
 	@IsString()
 	address: string;
-
+  
 	@ApiProperty()
-	@IsNotEmpty()
+  @IsOptional()
+  @Min(15)
+  @Max(120)
+  @Type(() => Number)
+  duration?: number | null;
+  
+	@ApiProperty()
+  @IsOptional()
 	@IsDate()
-	matchingDate: Date;
+  @Type(() => Date)
+	matchingDate?: Date | null;
 
 	@ApiProperty()
 	@IsString()

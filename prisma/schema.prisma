@@ -49,11 +49,6 @@ model Account {
   @@map("accounts")
 }
 
-enum MatchingStatus {
-  OPEN
-  CLOSED
-}
-
 enum MatchingType {
   QUICK
   YOTEI
@@ -62,9 +57,9 @@ enum MatchingType {
 model Matching {
   id                 Int            @id @default(autoincrement())
   ownerId            Int
-  status             MatchingStatus @default(OPEN)
   address            String         @default("")
-  matchingDate       DateTime       @default(now()) @map(name: "matching_date")
+  duration           Int?           
+  matchingDate       DateTime?      @map(name: "matching_date")
   desiredFood        String         @default("") @map(name: "desired_food")
   conversationTopics String         @default("") @map(name: "conversation_topics")
   matchingType       MatchingType   @default(QUICK) @map(name: "matching_type")

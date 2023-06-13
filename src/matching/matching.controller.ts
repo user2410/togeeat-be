@@ -9,7 +9,6 @@ import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestj
 import { MatchingPaginationDto } from './dto/pagination.dto';
 import { MatchingEntity } from './entities/matching.entity';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
-import { UserInfoGuard } from '@/auth/guards/user-info.guard';
 
 
 @Controller('matching')
@@ -18,12 +17,22 @@ export class MatchingController {
   constructor(private readonly matchingService: MatchingService) { }
 
   @Post()
-  @UseGuards(JwtAuthGuard, UserInfoGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create a new matching record' })
   @ApiCreatedResponse({ type: MatchingEntity })
   async create(@Request() req, @Body() createMatchingDto: CreateMatchingDto): Promise<MatchingEntity> {
-    const currentUserId: number = req.user.userId;
-    if (createMatchingDto.matchingDate.valueOf() < (new Date()).valueOf()) {
+    const currentUserId: number = req.user.id;
+    const {matchingDate, duration, matchingType} = createMatchingDto;
+    if(
+      (matchingType == 'QUICK' && !duration) || 
+      (matchingType == 'YOTEI' && !matchingDate)
+    ) {
+      throw new BadRequestException({message: 'Missing duration or matching date'});
+    }
+    if (duration && duration < 0) {
+      throw new BadRequestException({ message: 'Invalid duration' });
+    }
+    if (matchingDate && matchingDate.valueOf() < (new Date()).valueOf()) {
       throw new BadRequestException({ message: 'Invalid matching date' });
     }
     return this.matchingService.create(currentUserId, createMatchingDto);
@@ -40,21 +49,21 @@ export class MatchingController {
   }
 
   @Get('my-matchings')
-  @UseGuards(JwtAuthGuard, UserInfoGuard)
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new SearchQueryPipe())
   @ApiOperation({ summary: 'Get all matching created by current user' })
   async getMyMatchings(@Request() req, @Query() query: SearchQueryDto): Promise<PaginationDto> {
-    const currentUserId: number = req.user.userId;
+    const currentUserId: number = req.user.id;
     return await this.matchingService.getMatchingsOfUser(currentUserId, query);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a matching by id' })
   @ApiOkResponse({ type: MatchingEntity })
-  async findOne(@Param('id') id: number): Promise<MatchingEntity> {
+  async findOne(@Param('id') id: string): Promise<MatchingEntity> {
     const matching = await this.matchingService.findOne(+id);
     if (!matching) {
-      throw new NotFoundException(`Matching with id=${id} not found`);
+      throw new NotFoundException(`matching with id=${id} not found`);
     }
     return matching!;
   }
@@ -66,27 +75,19 @@ export class MatchingController {
   // }
 
   @Patch('join/:id')
-  @UseGuards(JwtAuthGuard, UserInfoGuard)
+  @UseGuards(JwtAuthGuard)
   @UseFilters(PrismaValidationExceptionFilter)
   @ApiOperation({ summary: 'Join current user to matching with id' })
   @ApiOkResponse()
   async joinMatching(@Request() req, @Param('id') id: string) {
-    const currentUserId: number = req.user.userId;
-    const matching = await this.matchingService.findOne(+id);
-    if (!matching) {
-      throw new NotFoundException();
-    }
-    if (matching.ownerId === currentUserId) {
-      return
-    }
-    return await this.matchingService.joinUser(+id, currentUserId);
+    return await this.matchingService.joinUser(+id, req.user.id);
   }
 
   @Patch('/leave/:id')
-  @UseGuards(JwtAuthGuard, UserInfoGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Current user leave matching with id, matching owner can remove other members from the matching' })
   async leaveMatching(@Request() req, @Param('id') id: string, @Query('userId') userId: string) {
-    const currentUserId: number = req.user.userId;
+    const currentUserId: number = req.user.id;
     const matching = await this.matchingService.findOne(+id);
     if (!matching) {
       throw new NotFoundException();
@@ -95,30 +96,29 @@ export class MatchingController {
     if (currentUserId === matching.ownerId) {
       const uid = +userId;
       if (!uid) {
-        throw new BadRequestException('Missing member id');
+        throw new BadRequestException('missing member id');
       }
       this.matchingService.removeUser(+id, uid);
       return;
     }
     // a member leaves
-    if (matching.userMatchings?.find(um => um.userId === currentUserId)) {
-      this.matchingService.removeUser(+id, currentUserId);
-    }
-    throw new ForbiddenException('Not allowed operation');
+    this.matchingService.removeUser(+id, currentUserId);
+
+    throw new ForbiddenException('not allowed operation');
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, UserInfoGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete a matching' })
   @ApiOkResponse()
   async remove(@Request() req, @Param('id') id: string): Promise<void> {
-    const currentUserId: number = req.user.userId;
+    const currentUserId: number = req.user.id;
     const matching = await this.matchingService.findOne(+id);
     if (!matching) {
       throw new NotFoundException();
     }
     if (matching.ownerId !== currentUserId) {
-      throw new UnauthorizedException();
+      throw new ForbiddenException('not allowed operation');
     }
     return await this.matchingService.remove(+id);
   }
