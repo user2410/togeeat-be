@@ -6,6 +6,8 @@ import { MatchingModule } from './matching/matching.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { ReviewController } from './review/review.controller';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -15,8 +17,10 @@ import { AuthModule } from './auth/auth.module';
     ScheduleModule.forRoot(),
     MatchingModule,
     UsersModule,
-    AuthModule],
-  controllers: [AppController],
+    AuthModule,
+    ReviewModule
+  ],
+  controllers: [AppController, ReviewController],
   providers: [AppService],
 })
 export class AppModule { }
