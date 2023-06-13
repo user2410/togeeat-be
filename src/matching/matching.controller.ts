@@ -5,7 +5,7 @@ import { MatchingService } from './matching.service';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pipe';
 import { PrismaValidationExceptionFilter } from '@/prisma/prisma-client-exception.filter';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MatchingPaginationDto } from './dto/pagination.dto';
 import { MatchingEntity } from './entities/matching.entity';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
@@ -39,7 +39,12 @@ export class MatchingController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all matching records, response is paginated' })
+  @ApiQuery({ name: 'ownerName', type: 'string', required: false, description: 'search for owner whose name conatains this case-insensitive string'})
+  @ApiQuery({ name: 'matchBefore', type: 'string', required: false, description: 'standard Date.toISOString() string'})
+  @ApiQuery({ name: 'matchAfter', type: 'string', required: false, description: 'standard Date.toISOString() string'})
+  @ApiQuery({ name: 'createdBefore', type: 'string', required: false, description: 'standard Date.toISOString() string'})
+  @ApiQuery({ name: 'createdAfter', type: 'string', required: false, description: 'standard Date.toISOString() string'})
+  @ApiOperation({ summary: 'List all matching records, response is paginated. Filter by fields of matchings' })
   @ApiOkResponse({ type: [MatchingPaginationDto] })
   @UsePipes(SearchQueryPipe)
   @UseFilters(PrismaValidationExceptionFilter)
