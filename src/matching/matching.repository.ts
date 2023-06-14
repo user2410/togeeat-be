@@ -5,12 +5,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { CreateMatchingDto } from "./dto/create-matching.dto";
 import { MatchingEntity } from "./entities/matching.entity";
 import { MatchingType, Prisma } from "@prisma/client";
-
-const defaultSelectedUserInfo = {
-	id: true,
-	name: true,
-	avatar: true,
-};
+import { defaultSelectedUserInfo } from "@/users/dto/default-selected-info";
 
 @Injectable()
 export class MatchingRepository {

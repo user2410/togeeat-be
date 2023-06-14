@@ -4,7 +4,6 @@ import { MatchingService } from './matching.service';
 // import { UpdateMatchingDto } from './dto/update-matching.dto';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pipe';
-import { PrismaValidationExceptionFilter } from '@/prisma/prisma-client-exception.filter';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MatchingPaginationDto } from './dto/pagination.dto';
 import { MatchingEntity, MatchingStatus } from './entities/matching.entity';
@@ -48,7 +47,6 @@ export class MatchingController {
   @ApiOperation({ summary: 'List all matching records, response is paginated. Filter matchings' })
   @ApiOkResponse({ type: [MatchingPaginationDto] })
   @UsePipes(SearchQueryPipe)
-  @UseFilters(PrismaValidationExceptionFilter)
   async list(@Query() query: SearchQueryDto): Promise<PaginationDto> {
     // console.log(query);
     return await this.matchingService.list(query);
@@ -58,6 +56,7 @@ export class MatchingController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(new SearchQueryPipe())
   @ApiOperation({ summary: 'Get all matching created by current user. Filter matchings' })
+  @ApiOkResponse({ type: [MatchingPaginationDto] })
   async getMyMatchings(@Request() req, @Query() query: SearchQueryDto): Promise<PaginationDto> {
     const currentUserId: number = req.user.id;
     return await this.matchingService.getMatchingsOfUser(currentUserId, query);
@@ -82,7 +81,6 @@ export class MatchingController {
 
   @Patch('join/:id')
   @UseGuards(JwtAuthGuard)
-  @UseFilters(PrismaValidationExceptionFilter)
   @ApiOperation({ summary: 'Join current user to matching with id' })
   @ApiOkResponse()
   async joinMatching(@Request() req, @Param('id') id: string) {
@@ -92,6 +90,7 @@ export class MatchingController {
   @Patch('/leave/:id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Current user leave matching with id, matching owner can remove other members from the matching' })
+  @ApiOkResponse()
   async leaveMatching(@Request() req, @Param('id') id: string, @Query('userId') userId: string) {
     const currentUserId: number = req.user.id;
     const matching = await this.matchingService.findOne(+id);

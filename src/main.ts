@@ -5,6 +5,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { PrismaInternalExceptionFilter, PrismaKnownRequestExceptionFilter, PrismaValidationExceptionFilter } from './prisma/prisma-client-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -21,6 +22,12 @@ async function bootstrap() {
       enableImplicitConversion: true, // enable plain-to-class conversion
     },
   }));
+  app.useGlobalFilters(
+    new PrismaInternalExceptionFilter(), 
+    new PrismaValidationExceptionFilter(),
+    new PrismaKnownRequestExceptionFilter()
+  );
+
 
   // add a listener for Prisma beforeExit event
   const prismaService = app.get(PrismaService);

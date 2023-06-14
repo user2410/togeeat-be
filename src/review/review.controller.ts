@@ -1,7 +1,7 @@
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pipe';
-import { Body, Controller, Get, NotFoundException, Param, Post, Query, Request, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, Query, Request, UseFilters, UseGuards, UsePipes } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ReviewEntity } from './entities/review.entity';

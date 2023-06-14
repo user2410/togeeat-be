@@ -12,15 +12,15 @@ import { SearchingService } from '@/common/generic/search-service';
  */
 
 @Injectable()
-export class MatchingService extends SearchingService{
-  constructor(private repository: MatchingRepository) { 
+export class MatchingService extends SearchingService {
+  constructor(private repository: MatchingRepository) {
     super();
   }
 
   async create(ownerId: number, data: CreateMatchingDto) {
-    const {matchingDate} = data;
-    data.matchingDate = matchingDate 
-      ? roundUpToMinute(matchingDate) 
+    const { matchingDate } = data;
+    data.matchingDate = matchingDate
+      ? roundUpToMinute(matchingDate)
       : addMinutes(new Date(), data.duration!);
     const matching = await this.repository.create(ownerId, data);
     await this.repository.addUserToMatching(matching.id, ownerId);
@@ -28,7 +28,7 @@ export class MatchingService extends SearchingService{
   }
 
   prepareFilterParam(params: object): object {
-    const paramObj: object = {};
+    const paramObj: object = { matchingDate: { gte: new Date() } };
     Object.keys(params).forEach(key => {
       switch (key) {
         case 'ownerName':
@@ -51,15 +51,15 @@ export class MatchingService extends SearchingService{
           break;
         case 'id': case 'ownerId': case 'duration':
           const num = parseInt(params[key]);
-          if (Number.isNaN(num)){
-            throw new BadRequestException({message: `invalid ${key} = ${params[key]}`});
+          if (Number.isNaN(num)) {
+            throw new BadRequestException({ message: `invalid ${key} = ${params[key]}` });
           }
           paramObj[key] = num;
           break;
         case 'status':
-          paramObj['matchingDate'] = params[key] === 'closed'
-            ? {lte: new Date()} 
-            : {gte: new Date()};
+          if (params[key] === 'closed') {
+            paramObj['matchingDate'] = { lte: new Date() };
+          }
           break;
         default:
           paramObj[key] = params[key];
@@ -70,13 +70,13 @@ export class MatchingService extends SearchingService{
   }
 
   async list(query: SearchQueryDto): Promise<PaginationDto> {
-    const {limit, offset, sortParam, filterParam} = this.prepareQuery(query);
-    return this.repository.list({limit, offset}, sortParam, filterParam);
+    const { limit, offset, sortParam, filterParam } = this.prepareQuery(query);
+    return this.repository.list({ limit, offset }, sortParam, filterParam);
   }
 
   async getMatchingsOfUser(userId: number, query: SearchQueryDto): Promise<PaginationDto> {
-    const {limit, offset, filterParam} = this.prepareQuery(query);
-    return await this.repository.getMatchingsOfUser(userId, {limit, offset}, filterParam);
+    const { limit, offset, filterParam } = this.prepareQuery(query);
+    return await this.repository.getMatchingsOfUser(userId, { limit, offset }, filterParam);
   }
 
   async findOne(id: number): Promise<MatchingEntity | null> {
@@ -95,9 +95,9 @@ export class MatchingService extends SearchingService{
     let condition: string;
 
     // check ability to join
-    condition =  matching.matchingType === 'QUICK' 
-    // - quick: 1 active matching only
-    ? `
+    condition = matching.matchingType === 'QUICK'
+      // - quick: 1 active matching only
+      ? `
       matching_type = 'QUICK'
       AND
       matching_date >= NOW()
@@ -107,8 +107,8 @@ export class MatchingService extends SearchingService{
         WHERE user_id = ${userId}
       )
     `
-    // - yotei: do not join 2 active matchings having the same matchingDate
-    : `
+      // - yotei: do not join 2 active matchings having the same matchingDate
+      : `
       matching_type = 'YOTEI'
       AND
       matching_date = '${matching.matchingDate?.toISOString()}'
@@ -121,12 +121,12 @@ export class MatchingService extends SearchingService{
 
     // get active matching
     const count = await this.repository.countMatching(condition);
-    console.log('count =',count);
-    if(count > 0) {
+    console.log('count =', count);
+    if (count > 0) {
       throw new ConflictException({
         message: matching.matchingType === 'QUICK'
-        ? 'already joined a quick matching'
-        : `already joined a yotei matching at ${matching.matchingDate}`
+          ? 'already joined a quick matching'
+          : `already joined a yotei matching at ${matching.matchingDate}`
       });
     }
 
