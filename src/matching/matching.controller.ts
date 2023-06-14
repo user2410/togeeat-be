@@ -7,7 +7,7 @@ import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pip
 import { PrismaValidationExceptionFilter } from '@/prisma/prisma-client-exception.filter';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MatchingPaginationDto } from './dto/pagination.dto';
-import { MatchingEntity } from './entities/matching.entity';
+import { MatchingEntity, MatchingStatus } from './entities/matching.entity';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 
 
@@ -44,7 +44,8 @@ export class MatchingController {
   @ApiQuery({ name: 'matchAfter', type: 'string', required: false, description: 'standard Date.toISOString() string'})
   @ApiQuery({ name: 'createdBefore', type: 'string', required: false, description: 'standard Date.toISOString() string'})
   @ApiQuery({ name: 'createdAfter', type: 'string', required: false, description: 'standard Date.toISOString() string'})
-  @ApiOperation({ summary: 'List all matching records, response is paginated. Filter by fields of matchings' })
+  @ApiQuery({name: 'status', enum: MatchingStatus, required: false, description: 'status of matching, if not provided all satisfied matchings is retrieved'})
+  @ApiOperation({ summary: 'List all matching records, response is paginated. Filter matchings' })
   @ApiOkResponse({ type: [MatchingPaginationDto] })
   @UsePipes(SearchQueryPipe)
   @UseFilters(PrismaValidationExceptionFilter)
@@ -56,7 +57,7 @@ export class MatchingController {
   @Get('my-matchings')
   @UseGuards(JwtAuthGuard)
   @UsePipes(new SearchQueryPipe())
-  @ApiOperation({ summary: 'Get all matching created by current user' })
+  @ApiOperation({ summary: 'Get all matching created by current user. Filter matchings' })
   async getMyMatchings(@Request() req, @Query() query: SearchQueryDto): Promise<PaginationDto> {
     const currentUserId: number = req.user.id;
     return await this.matchingService.getMatchingsOfUser(currentUserId, query);

@@ -3,6 +3,11 @@ import { MatchingType, UserMatching } from "@prisma/client";
 import { Type } from "class-transformer";
 import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 
+export enum MatchingStatus {
+  CLOSED = 'closed',
+  OPEN = 'open',
+}
+
 export class MatchingEntity {
 	@ApiProperty()
 	id: number;

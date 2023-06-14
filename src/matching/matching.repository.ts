@@ -47,13 +47,13 @@ export class MatchingRepository {
 		return new PaginationDto(res[0], res[1]);
 	}
 
-	async getMatchingsOfUser(id: number, { limit, offset }: SearchQueryDto, matchingFilter: object = {}): Promise<PaginationDto> {
+	async getMatchingsOfUser(id: number, { limit, offset }: SearchQueryDto, filterParam: object = {}): Promise<PaginationDto> {
 		const res = await this.prisma.$transaction([
-			this.prisma.userMatching.count({ where: { userId: id } }),
+			this.prisma.userMatching.count({ where: { userId: id, matching: filterParam } }),
 			this.prisma.userMatching.findMany({
 				where: { 
           userId: id,
-          matching: matchingFilter
+          matching: filterParam
         },
 				include: {
 					matching: {

@@ -24,11 +24,12 @@ export class ReviewRepository {
     })
   }
 
-  async find({limit, offset}: SearchQueryDto, filterParam: object) {
+  async find({limit, offset}: SearchQueryDto, sortParam: object, filterParam: object) {
     const res = await this.prisma.$transaction([
       this.prisma.reviewUser.count({where: filterParam}),
       this.prisma.reviewUser.findMany({
         where: filterParam,
+        orderBy: sortParam,
         skip: offset,
         take: limit,
       })

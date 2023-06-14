@@ -1,26 +1,33 @@
 import { PaginationDto } from '@/common/dto/pagination.dto';
 import { SearchQueryDto } from '@/common/pipes/search-query.pipe';
-import { roundUpToMinute } from '@/common/utils/date';
+import { addMinutes, roundUpToMinute } from '@/common/utils/date';
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMatchingDto } from './dto/create-matching.dto';
 import { MatchingEntity } from './entities/matching.entity';
 import { MatchingRepository } from './matching.repository';
+import { SearchingService } from '@/common/generic/search-service';
+
 /**
  * Service layer may do other things... e.g. send email of add a CPU-heavy task to a queue 
  */
+
 @Injectable()
-export class MatchingService {
-  constructor(private repository: MatchingRepository) { }
+export class MatchingService extends SearchingService{
+  constructor(private repository: MatchingRepository) { 
+    super();
+  }
 
   async create(ownerId: number, data: CreateMatchingDto) {
     const {matchingDate} = data;
-    data.matchingDate = matchingDate ? roundUpToMinute(matchingDate) : matchingDate;
+    data.matchingDate = matchingDate 
+      ? roundUpToMinute(matchingDate) 
+      : addMinutes(new Date(), data.duration!);
     const matching = await this.repository.create(ownerId, data);
     await this.repository.addUserToMatching(matching.id, ownerId);
     return matching;
   }
 
-  private prepareFilterParam(params: object): object {
+  prepareFilterParam(params: object): object {
     const paramObj: object = {};
     Object.keys(params).forEach(key => {
       switch (key) {
@@ -49,8 +56,10 @@ export class MatchingService {
           }
           paramObj[key] = num;
           break;
-        case 'matchingDate': case 'createdAt': case 'updatedAt':
-          paramObj[key] = new Date(params[key]);
+        case 'status':
+          paramObj['matchingDate'] = params[key] === 'closed'
+            ? {lte: new Date()} 
+            : {gte: new Date()};
           break;
         default:
           paramObj[key] = params[key];
@@ -61,24 +70,13 @@ export class MatchingService {
   }
 
   async list(query: SearchQueryDto): Promise<PaginationDto> {
-    query.limit = query.limit ? query.limit : 10;
-    query.offset = query.offset ? query.offset : 0;
-    let sortParam = {}, filterParam = {};
-    if (query.sort) {
-      sortParam[query.sort] = query.order;
-    } else {
-      sortParam['createdAt'] = 'desc';
-    }
-    if (query.rest) {
-      filterParam = this.prepareFilterParam(query.rest);
-    }
-    return this.repository.list(query, sortParam, filterParam);
+    const {limit, offset, sortParam, filterParam} = this.prepareQuery(query);
+    return this.repository.list({limit, offset}, sortParam, filterParam);
   }
 
   async getMatchingsOfUser(userId: number, query: SearchQueryDto): Promise<PaginationDto> {
-    query.limit = query.limit ? query.limit : 10;
-    query.offset = query.offset ? query.offset : 0;
-    return await this.repository.getMatchingsOfUser(userId, query);
+    const {limit, offset, filterParam} = this.prepareQuery(query);
+    return await this.repository.getMatchingsOfUser(userId, {limit, offset}, filterParam);
   }
 
   async findOne(id: number): Promise<MatchingEntity | null> {
@@ -102,7 +100,7 @@ export class MatchingService {
     ? `
       matching_type = 'QUICK'
       AND
-      created_at >= NOW() - INTERVAL '1 minute' * duration
+      matching_date >= NOW()
       AND id IN (
         SELECT matching_id
         FROM user_matching
@@ -127,8 +125,8 @@ export class MatchingService {
     if(count > 0) {
       throw new ConflictException({
         message: matching.matchingType === 'QUICK'
-        ? 'already join a quick matching'
-        : `already join a yotei matching at ${matching.matchingDate}`
+        ? 'already joined a quick matching'
+        : `already joined a yotei matching at ${matching.matchingDate}`
       });
     }
 

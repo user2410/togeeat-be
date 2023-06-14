@@ -9,7 +9,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-15T09:30:00'),
 				desiredFood: 'Pho bo mam tom',
 				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -17,7 +17,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T08:30:00'),
 				desiredFood: 'Pho bo mam tom',
 				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -25,7 +25,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T08:35:00'),
 				desiredFood: 'Cha ca',
 				conversationTopics: 'Movie',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -33,7 +33,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T08:40:00'),
 				desiredFood: 'Ga Quay',
 				conversationTopics: 'Sport',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -41,7 +41,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T08:45:00'),
 				desiredFood: 'Che Buoi',
 				conversationTopics: 'Soccer',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -49,7 +49,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T08:50:00'),
 				desiredFood: 'Banh Mi',
 				conversationTopics: 'The Final of Champion League',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -57,7 +57,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T08:55:00'),
 				desiredFood: 'Pho bo mam tom',
 				conversationTopics: 'Onepiece',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -65,7 +65,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:00:00'),
 				desiredFood: 'Pho bo mam tom',
 				conversationTopics: 'Tran Thanh',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -73,7 +73,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:05:00'),
 				desiredFood: 'Bun Cha',
 				conversationTopics: 'Rap Viet Season 3',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -81,7 +81,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:10:00'),
 				desiredFood: 'Lon Quay',
 				conversationTopics: 'Volleyball',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -89,7 +89,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:15:00'),
 				desiredFood: 'Banh Xeo',
 				conversationTopics: 'Tennis',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -97,7 +97,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:20:00'),
 				desiredFood: 'Bun Ca',
 				conversationTopics: 'Shopping',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -105,7 +105,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:25:00'),
 				desiredFood: 'Com Rang',
 				conversationTopics: 'Makeup',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -113,7 +113,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:30:00'),
 				desiredFood: 'Bun Bo',
 				conversationTopics: 'Share about life',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -121,7 +121,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:35:00'),
 				desiredFood: 'Thit Lon Quay',
 				conversationTopics: 'Politics',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -129,7 +129,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:40:00'),
 				desiredFood: 'Bun Dau Mam Tom',
 				conversationTopics: 'Math',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -137,7 +137,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:45:00'),
 				desiredFood: 'Pho Ga',
 				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -145,7 +145,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:50:00'),
 				desiredFood: 'Com Tam',
 				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -153,7 +153,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T09:55:00'),
 				desiredFood: 'Buffet',
 				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -161,7 +161,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T10:00:00'),
 				desiredFood: 'Pho Bat Da',
 				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			},
 			{
 				ownerId: 2,
@@ -169,7 +169,7 @@ export default async function seedMatchings(prisma: PrismaClient) {
 				matchingDate: new Date('2023-06-06T10:05:00'),
 				desiredFood: 'Bun Ca Cham',
 				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.QUICK,
+				matchingType: MatchingType.YOTEI,
 			}
 		]
 	})
