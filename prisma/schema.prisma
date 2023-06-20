@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider   = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -58,7 +58,9 @@ model Matching {
   id                 Int            @id @default(autoincrement())
   ownerId            Int
   address            String         @default("")
-  duration           Int?           
+  lat                Float          @default(21.007076103786403)
+  long               Float          @default(105.84310564167778)
+  duration           Int?
   matchingDate       DateTime?      @map(name: "matching_date")
   desiredFood        String         @default("") @map(name: "desired_food")
   conversationTopics String         @default("") @map(name: "conversation_topics")

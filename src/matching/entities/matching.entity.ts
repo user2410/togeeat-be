@@ -21,6 +21,16 @@ export class MatchingEntity {
 	address: string;
   
 	@ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  lat: number;
+  
+	@ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  long: number;
+
+	@ApiProperty()
   @IsOptional()
   @Min(15)
   @Max(120)
