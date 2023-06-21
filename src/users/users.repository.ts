@@ -3,6 +3,8 @@ import { Injectable } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserEntity } from "./entity/user.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { PaginationDto } from "@/common/dto/pagination.dto";
+import { SearchQueryDto } from "@/common/pipes/search-query.pipe";
 
 @Injectable()
 export class UsersRepository {
@@ -16,6 +18,27 @@ export class UsersRepository {
 			}
 		});
 	}
+
+  async find({ limit, offset }: SearchQueryDto, sortParam: object, filterParam: object): Promise<PaginationDto>{
+    // return await this.prisma.userInformation.findMany();
+    const res = await this.prisma.$transaction([
+      this.prisma.userInformation.count({where: filterParam}),
+      this.prisma.userInformation.findMany({
+        where: filterParam,
+        include: {
+          account: {
+            select: {
+              email: true,
+            }
+          }
+        },
+        orderBy: sortParam,
+        skip: offset,
+				take: limit,
+      })
+    ]);
+    return new PaginationDto(res[0], res[1]);
+  }
 
 	async getById(id: number, includeAccount: boolean): Promise<UserEntity | null> {
 		return await this.prisma.userInformation.findFirst({

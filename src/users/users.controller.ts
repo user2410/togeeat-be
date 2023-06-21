@@ -1,17 +1,23 @@
-import { Body, ConflictException, Controller, Get, InternalServerErrorException, NotFoundException, Param, Patch, Post, Request, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Query, UsePipes } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entity/user.entity';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaKnownRequestExceptionFilter } from '@/prisma/prisma-client-exception.filter';
-import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { SearchQueryDto, SearchQueryPipe } from '@/common/pipes/search-query.pipe';
+import { PaginationDto } from '@/common/dto/pagination.dto';
 
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
 
 	constructor(private service: UsersService) { }
+
+  @Get()
+  @UsePipes(SearchQueryPipe)
+  @ApiOperation({ summary: 'Get all users, filter by fields' })
+  async findAll(@Query() query: SearchQueryDto): Promise<PaginationDto> {
+    return await this.service.findAll(query);
+  }
 
 	@Get(':id')
 	@ApiOperation({ summary: 'Get user information, include associated account information' })
