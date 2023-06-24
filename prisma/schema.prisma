@@ -149,3 +149,15 @@ model DirectImage {
 
   @@map(name: "direct_images")
 }
+
+model File {
+  id        Int      @id @default(autoincrement())
+  fileName  String   @map("file_name")
+  fileExt   String   @map("file_ext")
+  encoding  String
+  mimeType  String   @map("mime_type")
+  content   Bytes
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map(name: "files")
+}

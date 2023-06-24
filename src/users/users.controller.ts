@@ -23,6 +23,7 @@ export class UsersController {
   }
 
 	@Get('user/:id')
+  @UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get user information, including associated account information' })
 	async findById(@Param('id') id: number): Promise<UserEntity> {
 		const user = await this.service.findById(id, true);

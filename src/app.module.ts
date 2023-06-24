@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ReviewController } from './review/review.controller';
 import { ReviewModule } from './review/review.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { ReviewModule } from './review/review.module';
     MatchingModule,
     UsersModule,
     AuthModule,
-    ReviewModule
+    ReviewModule,
+    FileModule
   ],
   controllers: [AppController, ReviewController],
   providers: [AppService],
