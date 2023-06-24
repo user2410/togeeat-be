@@ -23,14 +23,14 @@ model UserInformation {
   languageSkills  String  @default("") @map("language_skills")
   isPublic        Boolean @default(false)
 
-  account       Account        @relation(fields: [id], references: [id], onDelete: Cascade)
-  matching      Matching[]
-  UserMatchings UserMatching[]
-  ReviewUser1   ReviewUser[]   @relation("User1_ReviewUser")
-  ReviewUser2   ReviewUser[]   @relation("User2_ReviewUser")
-  UserHobby     UserHobby[]
-  MessageUser1  Message[]      @relation("User1_Message")
-  MessageUser2  Message[]      @relation("User2_Message")
+  account        Account        @relation(fields: [id], references: [id], onDelete: Cascade)
+  ownerMatchings Matching[]
+  userMatchings  UserMatching[]
+  reviewUser1    ReviewUser[]   @relation("User1_ReviewUser")
+  reviewUser2    ReviewUser[]   @relation("User2_ReviewUser")
+  hobbies        UserHobby[]
+  messageUser1   Message[]      @relation("User1_Message")
+  messageUser2   Message[]      @relation("User2_Message")
 
   @@map("user_information")
 }
@@ -116,7 +116,7 @@ model UserHobby {
 
 model Hobby {
   id        Int      @id @default(autoincrement()) @map(name: "id")
-  name      String   @default("") @map(name: "name")
+  name      String   @unique @default("") @map(name: "name")
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
 

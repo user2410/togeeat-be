@@ -5,6 +5,7 @@ import { UserEntity } from "./entity/user.entity";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { PaginationDto } from "@/common/dto/pagination.dto";
 import { SearchQueryDto } from "@/common/pipes/search-query.pipe";
+import { Hobby } from "@prisma/client";
 
 @Injectable()
 export class UsersRepository {
@@ -30,7 +31,8 @@ export class UsersRepository {
             select: {
               email: true,
             }
-          }
+          },
+          hobbies: true,
         },
         orderBy: sortParam,
         skip: offset,
@@ -43,7 +45,10 @@ export class UsersRepository {
 	async getById(id: number, includeAccount: boolean): Promise<UserEntity | null> {
 		return await this.prisma.userInformation.findFirst({
 			where: { id },
-			include: { account: includeAccount }
+			include: { 
+        account: includeAccount,
+        hobbies: true,
+      }
 		})
 	}
 
@@ -53,4 +58,25 @@ export class UsersRepository {
 			data
 		})
 	}
+
+  async createHobby(name: string): Promise<Hobby>{
+    return this.prisma.hobby.create({
+      data: {
+        name
+      }
+    })
+  }
+
+  async getHobbies(): Promise<Hobby[]>{
+    return this.prisma.hobby.findMany();
+  }
+
+  async assignHobby(userId: number, hobbyId: number): Promise<void> {
+    await this.prisma.userHobby.create({
+      data: {
+        userId,
+        hobbyId
+      }
+    });
+  }
 }
