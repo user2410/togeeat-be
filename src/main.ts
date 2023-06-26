@@ -6,9 +6,13 @@ import { PrismaService } from './prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { PrismaInternalExceptionFilter, PrismaKnownRequestExceptionFilter, PrismaValidationExceptionFilter } from './prisma/prisma-client-exception.filter';
+import { SocketIoAdapter } from './socket-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  const configService = app.get(ConfigService);
+  // console.log(configService);
 
   app.setGlobalPrefix('api');
   app.enableCors();
@@ -27,7 +31,7 @@ async function bootstrap() {
     new PrismaValidationExceptionFilter(),
     new PrismaKnownRequestExceptionFilter()
   );
-
+  app.useWebSocketAdapter(new SocketIoAdapter(app, configService));
 
   // add a listener for Prisma beforeExit event
   const prismaService = app.get(PrismaService);
@@ -41,10 +45,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  const configs = app.get(ConfigService);
-  console.log(configs);
-
-  const port: number = (configs.get('PORT') as number) || 8080;
+  const port: number = (configService.get('PORT') as number) || 8080;
   await app.listen(port, () => console.log(`Listening on port ${port}`));
 }
 bootstrap();

@@ -1,21 +1,21 @@
 import { PrismaModule } from '@/prisma/prisma.module';
+import { UsersModule } from '@/users/users.module';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
-import { AuthRepository } from './auth.repository';
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { CustomJwtModule } from './jwt.module';
 import { LocalStrategy } from './strategies/local.strategy';
-import { UsersService } from '@/users/users.service';
-import { UsersRepository } from '@/users/users.repository';
+import { AuthService } from './auth.service';
+import { AuthRepository } from './auth.repository';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  providers: [AuthRepository, AuthService, UsersRepository, UsersService, LocalStrategy, JwtStrategy],
+  providers: [AuthRepository, AuthService, LocalStrategy],
   imports: [
     PrismaModule,
     PassportModule,
+    UsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule], // Import ConfigModule to access environment variables
       useFactory: async (configService: ConfigService) => ({
@@ -26,5 +26,6 @@ import { UsersRepository } from '@/users/users.repository';
     }),
   ],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule { }

@@ -1,4 +1,4 @@
-import { OmitType } from "@nestjs/swagger";
+import { OmitType, PickType } from "@nestjs/swagger";
 import { AccountEntity } from "../entity/auth.entity";
 
-export class CreateAccountDto extends OmitType(AccountEntity, ['id', 'isAdmin', 'isBanned', 'createdAt', 'updatedAt']) { }
+export class CreateAccountDto extends PickType(AccountEntity, ['email', 'password']) { }

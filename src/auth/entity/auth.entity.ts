@@ -10,8 +10,8 @@ export class AccountEntity {
 	@IsNotEmpty()
 	email: string;
 
-	@IsNotEmpty()
 	@IsString()
+	@IsNotEmpty()
 	password: string;
 
 	@ApiProperty()

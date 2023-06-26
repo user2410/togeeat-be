@@ -1,18 +1,15 @@
-import { Module } from '@nestjs/common';
-import { MatchingService } from './matching.service';
-import { MatchingController } from './matching.controller';
+import { CustomJwtModule } from '@/auth/jwt.module';
 import { PrismaModule } from '@/prisma/prisma.module';
-import { MatchingRepository } from './matching.repository';
-import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
+import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { AuthService } from '@/auth/auth.service';
-import { AuthRepository } from '@/auth/auth.repository';
-import { JwtService } from '@nestjs/jwt';
+import { MatchingController } from './matching.controller';
+import { MatchingRepository } from './matching.repository';
+import { MatchingService } from './matching.service';
 
 @Module({
   controllers: [MatchingController],
-  imports: [PrismaModule, PassportModule],
-  providers: [MatchingRepository, AuthRepository, MatchingService, AuthService, JwtService, JwtStrategy],
+  imports: [PrismaModule, PassportModule, CustomJwtModule],
+  providers: [MatchingRepository, MatchingService],
   exports: [MatchingService],
 })
 export class MatchingModule { }

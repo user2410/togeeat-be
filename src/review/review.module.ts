@@ -8,11 +8,12 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
 import { AuthRepository } from '@/auth/auth.repository';
 import { AuthService } from '@/auth/auth.service';
+import { CustomJwtModule } from '@/auth/jwt.module';
 
 @Module({
   controllers: [ReviewController],
-  imports: [PrismaModule, PassportModule],
-  providers: [ReviewRepository, ReviewService, AuthRepository, AuthService, JwtService, JwtStrategy],
+  imports: [PrismaModule, PassportModule, CustomJwtModule],
+  providers: [ReviewRepository, ReviewService],
   exports: [ReviewService]
 })
 export class ReviewModule {}

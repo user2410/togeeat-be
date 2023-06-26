@@ -9,7 +9,7 @@ export abstract class SearchingService {
     sortParam: object,
     filterParam: object,
   } {
-    const limit = query.limit ? query.limit : 10;
+    const limit = query.limit ? query.limit : 100;
     const offset = query.offset ? query.offset : 0;
     let sortParam = {}, filterParam = {};
     if (query.sort) {
