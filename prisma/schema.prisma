@@ -136,6 +136,7 @@ model Group {
   users      UserInformation[]
 
   @@map("groups")
+  @@index(fields: [createdAt])
 }
 
 enum MessageType {
@@ -157,6 +158,7 @@ model Message {
   seenUsers   UserSeenMessages[]
 
   @@map(name: "messages")
+  @@index(fields: [createdAt])
 }
 
 model UserSeenMessages {
@@ -171,8 +173,7 @@ model UserSeenMessages {
 
 model File {
   id        Int      @id @default(autoincrement())
-  fileName  String   @map("file_name")
-  fileExt   String   @map("file_ext")
+  fileName  String   @map("file_name") @unique
   encoding  String
   mimeType  String   @map("mime_type")
   content   Bytes

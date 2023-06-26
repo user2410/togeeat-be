@@ -18,8 +18,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	}
 
 	async validate(payload: any) {
-		// console.log(payload);
-    console.log('jwt.strategy.ts validate');
 		return await this.authService.getById(+payload.sub);
 	}
 }

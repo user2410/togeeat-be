@@ -38,7 +38,6 @@ export class ChatController {
     @Query('limit') limit: number, @Query('offset') offset: number) : Promise<PaginationDto> {
     const currentUserId = req.user.id;
     // check whether currentUserId is in the group
-    console.log(currentUserId, groupId);
     const isMember = await this.service.isUserInGroup(currentUserId, groupId);
     if (!isMember) {
       throw new ForbiddenException({ message: 'You are not a member of this group'});

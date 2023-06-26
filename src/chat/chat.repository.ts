@@ -70,7 +70,6 @@ export class ChatRepository {
   }
 
   async isUserInGroup(userId: number, groupId: string) : Promise<boolean> {
-    console.log(userId, groupId);
     return await this.prisma.group.count({
       where: {id: groupId, users: {some: {id: userId}}}
     }) > 0;

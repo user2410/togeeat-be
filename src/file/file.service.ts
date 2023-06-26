@@ -9,22 +9,26 @@ export class FileService {
     private prisma: PrismaService,
   ) {}
 
-  async uploadFile(originalName: string, mimeType: string, encoding: string, file: Buffer) : Promise<File> {
+  async uploadFile(originalName: string, mimeType: string, encoding: string, file: Buffer)  {
     const { fileName, fileExt } = separateFilenameAndExtension(originalName);
     return await this.prisma.file.create({
       data: {
-        fileName: fileName ? fileName : 'file',
-        fileExt: fileExt ? fileExt : '',
+        fileName: `${fileName ? fileName : 'file'}_${Date.now()}.${fileExt ? fileExt : ''}`,
         mimeType,
         encoding,
         content: file,
+      },
+      select: {
+        fileName: true,
+        mimeType: true,
+        createdAt: true,
       }
     });
   }
 
-  async getFile(id: number) : Promise<File | null> {
-    return await this.prisma.file.findUnique({
-      where: { id },
+  async getFile(fileName: string) : Promise<File | null> {
+    return await this.prisma.file.findFirst({
+      where: { fileName },
     });
   }
 }

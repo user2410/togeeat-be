@@ -23,7 +23,6 @@ export class ChatService{
   }
 
   async isUserInGroup(userId: number, groupId: string) : Promise<boolean> {
-    console.log(userId, groupId);
     return await this.repository.isUserInGroup(userId, groupId);
   }
 
