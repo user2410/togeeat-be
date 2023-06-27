@@ -4,7 +4,7 @@ import { SearchQueryDto } from "../common/pipes/search-query.pipe";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateMatchingDto } from "./dto/create-matching.dto";
 import { MatchingEntity } from "./entities/matching.entity";
-import { MatchingType, Prisma } from "@prisma/client";
+import { MatchingType, Prisma, UserInformation } from "@prisma/client";
 import { defaultSelectedUserInfo } from "@/users/dto/default-selected-info";
 
 @Injectable()
@@ -68,6 +68,21 @@ export class MatchingRepository {
 		])
 		return new PaginationDto(res[0], res[1]);
 	}
+
+  async searchMatchingMembersByName(userId: number, memberName: string) : Promise<UserInformation[]>{
+    const res = await this.prisma.$queryRaw<UserInformation[]>`
+      select id, name, avatar from user_information 
+        where id in (
+          select distinct user_id from user_matching 
+            where matching_id in (
+              select matching_id from user_matching 
+              where user_id=${userId}
+            ) and user_id <> ${userId}
+        ) and name ilike ${'%'+ memberName + '%'};
+    `;
+    console.log(res);
+    return res;
+  }
   
   async countMatching(condition: string) : Promise<number> {
     console.log(`

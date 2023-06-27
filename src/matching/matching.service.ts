@@ -6,6 +6,7 @@ import { CreateMatchingDto } from './dto/create-matching.dto';
 import { MatchingEntity } from './entities/matching.entity';
 import { MatchingRepository } from './matching.repository';
 import { SearchingService } from '@/common/generic/search-service';
+import { UserInformation } from '@prisma/client';
 
 /**
  * Service layer may do other things... e.g. send email of add a CPU-heavy task to a queue 
@@ -77,6 +78,10 @@ export class MatchingService extends SearchingService {
   async getMatchingsOfUser(userId: number, query: SearchQueryDto): Promise<PaginationDto> {
     const { limit, offset, filterParam } = this.prepareQuery(query);
     return await this.repository.getMatchingsOfUser(userId, { limit, offset }, filterParam);
+  }
+
+  async searchMatchingMembersByName(userId: number, memberName: string) : Promise<UserInformation[]>{
+    return await this.repository.searchMatchingMembersByName(userId, memberName);
   }
 
   async findOne(id: number): Promise<MatchingEntity | null> {

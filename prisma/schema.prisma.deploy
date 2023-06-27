@@ -2,13 +2,15 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   engineType = "binary"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgcrypto]
 }
 
 model UserInformation {
@@ -24,14 +26,15 @@ model UserInformation {
   languageSkills  String  @default("") @map("language_skills")
   isPublic        Boolean @default(false)
 
-  account        Account        @relation(fields: [id], references: [id], onDelete: Cascade)
+  account        Account            @relation(fields: [id], references: [id], onDelete: Cascade)
   ownerMatchings Matching[]
   userMatchings  UserMatching[]
-  reviewUser1    ReviewUser[]   @relation("User1_ReviewUser")
-  reviewUser2    ReviewUser[]   @relation("User2_ReviewUser")
+  reviewUser1    ReviewUser[]       @relation("user1_reviews")
+  reviewUser2    ReviewUser[]       @relation("user2_reviews")
   hobbies        UserHobby[]
-  messageUser1   Message[]      @relation("User1_Message")
-  messageUser2   Message[]      @relation("User2_Message")
+  seenMessages   UserSeenMessages[]
+  messages       Message[]
+  groups         Group[]
 
   @@map("user_information")
 }
@@ -87,19 +90,16 @@ model UserMatching {
 }
 
 model ReviewUser {
-  id              Int      @id @default(autoincrement()) @map(name: "comment_id")
-  user1Id         Int      @map(name: "user1_id")
-  user2Id         Int      @map(name: "user2_id")
-  parentCommentId Int?     @map(name: "parent_comment_id")
-  content         String
-  star            Int      @default(0)
-  createdAt       DateTime @default(now()) @map(name: "created_at")
-  updatedAt       DateTime @updatedAt @map(name: "updated_at")
+  id        Int      @id @default(autoincrement()) @map(name: "comment_id")
+  user1Id   Int      @map(name: "user1_id")
+  user2Id   Int      @map(name: "user2_id")
+  content   String
+  star      Int      @default(0)
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 
-  user1          UserInformation @relation("User1_ReviewUser", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2          UserInformation @relation("User2_ReviewUser", fields: [user2Id], references: [id], onDelete: Cascade)
-  parentComment  ReviewUser?     @relation("Parent_Comments", fields: [parentCommentId], references: [id])
-  parentComments ReviewUser[]    @relation("Parent_Comments")
+  user1 UserInformation @relation("user1_reviews", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 UserInformation @relation("user2_reviews", fields: [user2Id], references: [id], onDelete: Cascade)
 
   @@map(name: "review_user")
 }
@@ -126,27 +126,59 @@ model Hobby {
   @@map(name: "hobbies")
 }
 
-model Message {
-  id           Int             @id @default(autoincrement()) @map(name: "id")
-  user1Id      Int             @map(name: "user1_id")
-  user2Id      Int             @map(name: "user2_id")
-  createdAt    DateTime        @default(now()) @map(name: "created_at")
-  updatedAt    DateTime        @updatedAt @map(name: "updated_at")
-  content      String          @map(name: "content")
-  user1        UserInformation @relation("User1_Message", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2        UserInformation @relation("User2_Message", fields: [user2Id], references: [id], onDelete: Cascade)
-  directImages DirectImage[]
+model Group {
+  id            String   @id @default(dbgenerated("(gen_random_uuid()::TEXT)")) @db.Uuid
+  createdAt     DateTime @default(now())
+  lastMessageAt DateTime @default(now()) @map(name: "last_message_at")
+  name          String?
+  isGroup       Boolean  @default(false) @map(name: "is_group")
 
-  @@map(name: "messages")
+  messages   Message[]
+  users      UserInformation[]
+
+  @@map("groups")
+  @@index(fields: [createdAt])
 }
 
-model DirectImage {
-  id        Int      @id @default(autoincrement())
-  messageId Int      @map(name: "message_id")
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
-  imageLink String   @map(name: "image_link")
-  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+enum MessageType {
+  TEXT
+  IMAGE
+  // VIDEO
+  // AUDIO
+}
 
-  @@map(name: "direct_images")
+model Message {
+  id          String             @id @default(dbgenerated("(gen_random_uuid()::TEXT)")) @db.Uuid
+  createdAt   DateTime           @default(now()) @map(name: "created_at")
+  content     String             @map(name: "content")
+  contentType MessageType        @default(TEXT) @map(name: "content_type")
+  senderId    Int                @map("sender_id")
+  sender      UserInformation    @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  groupId     String             @map("group_id") @db.Uuid
+  groups      Group              @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  seenUsers   UserSeenMessages[]
+
+  @@map(name: "messages")
+  @@index(fields: [createdAt])
+}
+
+model UserSeenMessages {
+  userId    Int             @map("user_id")
+  user      UserInformation @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messageId String          @map("message_id") @db.Uuid
+  message   Message         @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@id([userId, messageId])
+  @@map("user_seen_messages")
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  fileName  String   @map("file_name") @unique
+  encoding  String
+  mimeType  String   @map("mime_type")
+  content   Bytes
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map(name: "files")
 }

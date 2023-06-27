@@ -38,7 +38,7 @@ export class MatchingController {
   }
 
   @Get()
-  @ApiQuery({ name: 'ownerName', type: 'string', required: false, description: 'search for owner whose name conatains this case-insensitive string'})
+  @ApiQuery({ name: 'ownerName', type: 'string', required: false, description: 'search for matchings whose owners whose name conatains this case-insensitive string'})
   @ApiQuery({ name: 'matchBefore', type: 'string', required: false, description: 'standard Date.toISOString() string'})
   @ApiQuery({ name: 'matchAfter', type: 'string', required: false, description: 'standard Date.toISOString() string'})
   @ApiQuery({ name: 'createdBefore', type: 'string', required: false, description: 'standard Date.toISOString() string'})
@@ -60,6 +60,17 @@ export class MatchingController {
   async getMyMatchings(@Request() req, @Query() query: SearchQueryDto): Promise<PaginationDto> {
     const currentUserId: number = req.user.id;
     return await this.matchingService.getMatchingsOfUser(currentUserId, query);
+  }
+
+  @Get('members')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ name: 'memberName', type: 'string', required: false, description: 'search for matching members name conatains this case-insensitive string'})
+  async searchMatchingMembersByName(@Request() req, @Query('memberName') memberName: string) {
+    const currentUserId: number = req.user.id;
+    if(!memberName) {
+      throw new BadRequestException({message: 'Missing member name'})
+    }
+    return this.matchingService.searchMatchingMembersByName(currentUserId, memberName);
   }
 
   @Get(':id')
