@@ -170,14 +170,3 @@ model UserSeenMessages {
   @@id([userId, messageId])
   @@map("user_seen_messages")
 }
-
-model File {
-  id        Int      @id @default(autoincrement())
-  fileName  String   @map("file_name") @unique
-  encoding  String
-  mimeType  String   @map("mime_type")
-  content   Bytes
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map(name: "files")
-}

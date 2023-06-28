@@ -19,8 +19,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     JwtModule.registerAsync({
       imports: [ConfigModule], // Import ConfigModule to access environment variables
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'mysecret',
-        signOptions: { expiresIn: configService.get<string>('JWT_ACCESS_TOKEN_DURATION') || '3h' },
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: configService.get<string>('JWT_ACCESS_TOKEN_DURATION') },
       }),
       inject: [ConfigService],
     }),

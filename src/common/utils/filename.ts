@@ -1,15 +1,16 @@
-export function separateFilenameAndExtension(filename: string) {
+export function separateFilenameAndExtension(filename: string) : {
+  fileName: string;
+  fileExt: string;
+} {
   const lastDotIndex = filename.lastIndexOf('.');
   if (lastDotIndex === -1) {
     return {
-      filename: filename,
-      extension: ''
+      fileName: filename,
+      fileExt: ''
     };
   }
-  const filenamePart = filename.slice(0, lastDotIndex);
-  const extensionPart = filename.slice(lastDotIndex + 1);
   return {
-    fileName: filenamePart,
-    fileExt: extensionPart
+    fileName: filename.slice(0, lastDotIndex),
+    fileExt: filename.slice(lastDotIndex + 1)
   };
 }
