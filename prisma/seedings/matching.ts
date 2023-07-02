@@ -1,176 +1,204 @@
 import { MatchingType, PrismaClient } from "@prisma/client";
 
 export default async function seedMatchings(prisma: PrismaClient) {
-	await prisma.matching.createMany({
-		data: [
-			{
-				ownerId: 2,
-				address: '123 Nguyen Van A Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-15T09:30:00'),
-				desiredFood: 'Pho bo mam tom',
-				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '123 Bui Thi Xuan Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T08:30:00'),
-				desiredFood: 'Pho bo mam tom',
-				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '12 Ly Thuong Kiet Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T08:35:00'),
-				desiredFood: 'Cha ca',
-				conversationTopics: 'Movie',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '53 Quan Xu Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T08:40:00'),
-				desiredFood: 'Ga Quay',
-				conversationTopics: 'Sport',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '35 Kim Mã Street, Ha Noi City',
-				matchingDate: new Date('2023-06-06T08:45:00'),
-				desiredFood: 'Che Buoi',
-				conversationTopics: 'Soccer',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '45 Kim Mã Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T08:50:00'),
-				desiredFood: 'Banh Mi',
-				conversationTopics: 'The Final of Champion League',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '85 Ta Quang Buu Street, Ha Noi City',
-				matchingDate: new Date('2023-06-06T08:55:00'),
-				desiredFood: 'Pho bo mam tom',
-				conversationTopics: 'Onepiece',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '67 Nguyen Tat Thanh Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T09:00:00'),
-				desiredFood: 'Pho bo mam tom',
-				conversationTopics: 'Tran Thanh',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '92 Hoang Mai Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T09:05:00'),
-				desiredFood: 'Bun Cha',
-				conversationTopics: 'Rap Viet Season 3',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '42 Nguyen Huu Canh Street, Ha Noi City',
-				matchingDate: new Date('2023-06-06T09:10:00'),
-				desiredFood: 'Lon Quay',
-				conversationTopics: 'Volleyball',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '75 Bui Thi Xuan Street, Ha Noi City',
-				matchingDate: new Date('2023-06-06T09:15:00'),
-				desiredFood: 'Banh Xeo',
-				conversationTopics: 'Tennis',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '65 Lac Trung Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T09:20:00'),
-				desiredFood: 'Bun Ca',
-				conversationTopics: 'Shopping',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '48 Xuan Dieu Street, Da Nang City',
-				matchingDate: new Date('2023-06-06T09:25:00'),
-				desiredFood: 'Com Rang',
-				conversationTopics: 'Makeup',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '43 Tran Hung Dao Street, Hue City',
-				matchingDate: new Date('2023-06-06T09:30:00'),
-				desiredFood: 'Bun Bo',
-				conversationTopics: 'Share about life',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '37 Kim Nguu Street, Ha Noi City',
-				matchingDate: new Date('2023-06-06T09:35:00'),
-				desiredFood: 'Thit Lon Quay',
-				conversationTopics: 'Politics',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '58 Nguyen Trai Street, Ha Noi City',
-				matchingDate: new Date('2023-06-06T09:40:00'),
-				desiredFood: 'Bun Dau Mam Tom',
-				conversationTopics: 'Math',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '73 Xuan Dieu Street, Da Nang City',
-				matchingDate: new Date('2023-06-06T09:45:00'),
-				desiredFood: 'Pho Ga',
-				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '64 30-4 Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T09:50:00'),
-				desiredFood: 'Com Tam',
-				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '18 8-3 Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T09:55:00'),
-				desiredFood: 'Buffet',
-				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '13 De La Thanh Street, Ha Noi City',
-				matchingDate: new Date('2023-06-06T10:00:00'),
-				desiredFood: 'Pho Bat Da',
-				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.YOTEI,
-			},
-			{
-				ownerId: 2,
-				address: '454 Nguyen Van Troi Street, Ho Chi Minh City',
-				matchingDate: new Date('2023-06-06T10:05:00'),
-				desiredFood: 'Bun Ca Cham',
-				conversationTopics: 'The Impact of Artificial Intelligence on Society',
-				matchingType: MatchingType.YOTEI,
-			}
-		]
-	})
+  const defaultLat = 21.007076103786403; // Default latitude
+  const defaultLong = 105.84310564167778; // Default longitude
+
+  await prisma.matching.createMany({
+    data: [
+      // QUICK matchings
+      {
+        ownerId: 1,
+        address: generateRandomAddress(),
+        lat: defaultLat + getRandomOffset(),
+        long: defaultLong + getRandomOffset(),
+        duration: getRandomDuration(),
+        matchingDate: new Date('2023-05-07'),
+        desiredFood: 'Ice Cream',
+        conversationTopics: 'Sports',
+        matchingType: MatchingType.QUICK,
+      },
+      {
+        ownerId: 2,
+        address: generateRandomAddress(),
+        lat: defaultLat + getRandomOffset(),
+        long: defaultLong + getRandomOffset(),
+        duration: getRandomDuration(),
+        matchingDate: new Date('2023-06-06'),
+        desiredFood: 'Pizza',
+        conversationTopics: 'Movies',
+        matchingType: MatchingType.QUICK,
+      },
+      {
+        ownerId: 3,
+        address: generateRandomAddress(),
+        lat: defaultLat + getRandomOffset(),
+        long: defaultLong + getRandomOffset(),
+        duration: getRandomDuration(),
+        matchingDate: new Date('2023-06-15'),
+        desiredFood: 'Burgers',
+        conversationTopics: 'Technology',
+        matchingType: MatchingType.QUICK,
+      },
+      {
+        ownerId: 4,
+        address: generateRandomAddress(),
+        lat: defaultLat + getRandomOffset(),
+        long: defaultLong + getRandomOffset(),
+        duration: getRandomDuration(),
+        matchingDate: new Date('2023-06-21'),
+        desiredFood: 'Sushi',
+        conversationTopics: 'Travel',
+        matchingType: MatchingType.QUICK,
+      },
+      // YOTEI matchings
+      {
+        ownerId: 5,
+        address: generateRandomAddress(),
+        lat: defaultLat + getRandomOffset(),
+        long: defaultLong + getRandomOffset(),
+        matchingDate: new Date('2023-07-05'),
+        desiredFood: 'Pasta',
+        conversationTopics: 'Music',
+        matchingType: MatchingType.YOTEI,
+      },
+      {
+        ownerId: 2,
+        address: generateRandomAddress(),
+        lat: defaultLat + getRandomOffset(),
+        long: defaultLong + getRandomOffset(),
+        matchingDate: new Date('2023-07-21'),
+        desiredFood: 'Steak',
+        conversationTopics: 'Art',
+        matchingType: MatchingType.YOTEI,
+      },
+      {
+        ownerId: 1,
+        address: generateRandomAddress(),
+        lat: defaultLat + getRandomOffset(),
+        long: defaultLong + getRandomOffset(),
+        matchingDate: new Date('2023-06-24'),
+        desiredFood: 'Sushi',
+        conversationTopics: 'Travel',
+        matchingType: MatchingType.YOTEI,
+      },
+      {
+        ownerId: 3,
+        address: generateRandomAddress(),
+        lat: defaultLat + getRandomOffset(),
+        long: defaultLong + getRandomOffset(),
+        matchingDate: new Date('2023-07-20'),
+        desiredFood: 'Burgers',
+        conversationTopics: 'Technology',
+        matchingType: MatchingType.YOTEI,
+      },
+      // Add more matchings as needed...
+    ]
+  });
+
+  await prisma.userMatching.createMany({
+    data: [
+      {
+        userId: 1,
+        matchingId: 1,
+      },
+      {
+        userId: 3,
+        matchingId: 1,
+      },
+      {
+        userId: 4,
+        matchingId: 1,
+      },
+      {
+        userId: 2,
+        matchingId: 2,
+      },
+      {
+        userId: 3,
+        matchingId: 3,
+      },
+      {
+        userId: 2,
+        matchingId: 4,
+      },
+      {
+        userId: 4,
+        matchingId: 4,
+      },
+      {
+        userId: 1,
+        matchingId: 5,
+      },
+      {
+        userId: 5,
+        matchingId: 5,
+      },
+      {
+        userId: 2,
+        matchingId: 6,
+      },
+      {
+        userId: 3,
+        matchingId: 6,
+      },
+      {
+        userId: 1,
+        matchingId: 7,
+      },
+      {
+        userId: 2,
+        matchingId: 7,
+      },
+      {
+        userId: 5,
+        matchingId: 7,
+      },
+      {
+        userId: 3,
+        matchingId: 8,
+      },
+      {
+        userId: 4,
+        matchingId: 8,
+      },
+    ]
+  })
+}
+
+// Helper function to generate a random offset within 0.01
+function getRandomOffset() {
+  return (Math.random() - 0.5) * 0.02;
+}
+
+// Helper function to generate a random duration within 15-120 minutes
+function getRandomDuration() {
+  return Math.floor(Math.random() * (120-15)) + 15;
+}
+
+// Helper function to generate a random address
+function generateRandomAddress() {
+  const cities = [
+    'Hanoi',
+    'Ho Chi Minh City',
+    'Da Nang',
+    'Hai Phong',
+    'Can Tho',
+    // Add more city names as needed...
+  ];
+
+  const streets = [
+    'Nguyen Hue',
+    'Le Loi',
+    'Tran Hung Dao',
+    'Phan Dinh Phung',
+    'Hoang Van Thu',
+    // Add more street names as needed...
+  ];
+
+  const randomCity = cities[Math.floor(Math.random() * cities.length)];
+  const randomStreet = streets[Math.floor(Math.random() * streets.length)];
+  const randomHouseNumber = Math.floor(Math.random() * 1000);
+
+  return `${randomHouseNumber} ${randomStreet}, ${randomCity}`;
 }

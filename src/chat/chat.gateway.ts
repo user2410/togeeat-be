@@ -1,11 +1,10 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, WsException } from '@nestjs/websockets';
+import { Logger } from '@nestjs/common';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
+import { Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
-import { Server, Socket, Namespace } from 'socket.io';
-import { Logger } from '@nestjs/common';
-import { SocketWithAuth } from './types';
 import { CreateGroupDto } from './dto/create-room.dto';
+import { SocketWithAuth } from './types';
 
 // ws-room name = group id
 @WebSocketGateway({
@@ -32,7 +31,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     // add to map
     this.mapUserIdToSocketId.set(socket.userID, socket.id);
-    // get list of joined rooms
 
     this.logger.log(`WS Client with id: ${socket.id} connected!`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
@@ -45,11 +43,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.mapUserIdToSocketId.delete(socket.userID);
 
     this.logger.debug(
-      `Socket disconnected with userID: ${socket.userID}`,
+      `Socket with userID: ${socket.userID} disconnected`,
     );
 
     this.logger.log(`WS Client with id: ${socket.id} disconnected!`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
+  }
+
+  @SubscribeMessage('getGroups')
+  async getGroups(@MessageBody() {limit, offset}: {limit: number, offset: number}, @ConnectedSocket() socket: SocketWithAuth) {
+    limit = limit || 100;
+    offset = offset || 0;
+    const res = await this.service.getGroups(socket.userID, +limit, +offset);
+
+    // join current socket to ws-rooms
+    for(const {id} of res.items) {
+      console.log(id);
+      socket.join(id);
+    }
+
+    return res;
   }
 
   @SubscribeMessage('createGroup')

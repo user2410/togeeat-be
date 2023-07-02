@@ -1,7 +1,5 @@
 import { separateFilenameAndExtension } from '@/common/utils/filename';
-import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { File } from '@prisma/client';
 import { FirebaseService } from './firebase.service';
 
 @Injectable()
