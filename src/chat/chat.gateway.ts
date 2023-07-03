@@ -65,6 +65,23 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return res;
   }
 
+  @SubscribeMessage('getMessages')
+  async getMessages(@MessageBody() {limit, offset, groupId}: {limit: number, offset: number, groupId: string}, @ConnectedSocket() socket: SocketWithAuth ) {
+    // check whether the current user with socket.id is in ws-room
+    if(!socket.rooms.has(groupId)) {
+      if(!(await this.service.isUserInGroup(socket.userID, groupId))){
+        throw new WsException('You are not in this group!');
+      }
+      socket.join(groupId);
+    }
+    
+    limit = limit || 100;
+    offset = offset || 0;
+    const res = await this.service.getMessages(groupId, +limit, +offset);
+
+    return res;
+  }
+
   @SubscribeMessage('createGroup')
   async createRoom(@MessageBody() data: CreateGroupDto, @ConnectedSocket() socket: SocketWithAuth) {
     this.logger.log(`WS Client with id: ${socket.id}`);
@@ -81,9 +98,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         // join member to ws-room
         this.ns.sockets.get(socketId)?.join(newGroup.id);
       }
-      // emit event create room to all users in ws-room
-      this.ns.to(newGroup.id).emit('createGroup', newGroup);
     }
+    
+    // emit event create room to all users in ws-room
+    this.ns.to(newGroup.id).emit('createGroup', newGroup);
 
     return newGroup;
   }

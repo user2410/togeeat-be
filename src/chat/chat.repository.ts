@@ -13,11 +13,16 @@ export class ChatRepository {
     const newGroup = await this.prisma.group.create({
       data: {
         name: data.name,
-        isGroup: data.isGroup,
+        isGroup: data.members.filter(item => item !== userId).length > 1,
         users: {
           connect: [{id: userId}, ...data.members.map(id => ({id}))]
         }
-      }
+      },
+      include: {
+        users: {
+          select: defaultSelectedUserInfo
+        }
+      },
     });
     return newGroup;
   }
@@ -27,6 +32,11 @@ export class ChatRepository {
       this.prisma.group.count({where: {users: {some: {id: userId}}}}),
       this.prisma.group.findMany({
         where: {users: {some: {id: userId}}},
+        include: {
+          users: {
+            select: defaultSelectedUserInfo
+          }
+        },
         orderBy: {createdAt: 'desc'},
         skip: offset,
         take: limit,
@@ -51,6 +61,11 @@ export class ChatRepository {
       data: {
         ...data,
         senderId: userId,
+      },
+      include: {
+        sender: {
+          select: defaultSelectedUserInfo
+        }
       }
     });
     return newMessage;
@@ -61,6 +76,11 @@ export class ChatRepository {
       this.prisma.message.count({where: {groupId}}),
       this.prisma.message.findMany({
         where: {groupId},
+        include: {
+          sender: {
+            select: defaultSelectedUserInfo
+          },
+        },
         orderBy: {createdAt: 'desc'},
         skip: offset,
         take: limit,
