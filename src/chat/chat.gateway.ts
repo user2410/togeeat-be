@@ -1,12 +1,22 @@
-import { Logger } from '@nestjs/common';
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
+import { ForbiddenException, Logger, ParseUUIDPipe, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Namespace } from 'socket.io';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { CreateGroupDto } from './dto/create-room.dto';
+import { CreateGroupDto } from './dto/create-group.dto';
 import { SocketWithAuth } from './types';
+import { GetMessagesDto } from './dto/get-messages.dto';
+import { GetGroupsDto } from './dto/get-groups.dto';
+import { WsCatchAllFilter } from './exceptions/ws-catch-all-filter';
 
 // ws-room name = group id
+@UsePipes(new ValidationPipe({
+  transform: true, // enable class-transformer
+  transformOptions: {
+    enableImplicitConversion: true, // enable plain-to-class conversion
+  },
+}))
+@UseFilters(new WsCatchAllFilter())
 @WebSocketGateway({
   namespace: 'chat'
 })
@@ -51,7 +61,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('getGroups')
-  async getGroups(@MessageBody() {limit, offset}: {limit: number, offset: number}, @ConnectedSocket() socket: SocketWithAuth) {
+  async getGroups(@MessageBody() {limit, offset}: GetGroupsDto, @ConnectedSocket() socket: SocketWithAuth) {
     limit = limit || 100;
     offset = offset || 0;
     const res = await this.service.getGroups(socket.userID, +limit, +offset);
@@ -66,11 +76,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('getMessages')
-  async getMessages(@MessageBody() {limit, offset, groupId}: {limit: number, offset: number, groupId: string}, @ConnectedSocket() socket: SocketWithAuth ) {
+  async getMessages(@MessageBody() {limit, offset, groupId}: GetMessagesDto, @ConnectedSocket() socket: SocketWithAuth ) {
     // check whether the current user with socket.id is in ws-room
     if(!socket.rooms.has(groupId)) {
       if(!(await this.service.isUserInGroup(socket.userID, groupId))){
-        throw new WsException('You are not in this group!');
+        throw new ForbiddenException('You are not in this group!');
       }
       socket.join(groupId);
     }
@@ -111,10 +121,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // check whether current user is in group
     for(const groupId of data.groupIds) {
       if(!(await this.service.isUserInGroup(socket.userID, groupId))) {
-        throw new WsException('You are not in this group');
+        throw new ForbiddenException('You are not in this group');
       }
       socket.join(groupId);
     }
+  }
+
+  @SubscribeMessage('joinGroup')
+  async joinGroup(@MessageBody('groupId', ParseUUIDPipe) groupId: string, @ConnectedSocket() socket: SocketWithAuth) {
+    // join group in db
+    await this.service.joinGroup(socket.userID, groupId);
+    // join ws-room
+    socket.join(groupId);
+  }
+
+  @SubscribeMessage('leaveGroup')
+  async leaveGroup(@MessageBody('groupId', ParseUUIDPipe) groupId: string, @ConnectedSocket() socket: SocketWithAuth) {
+    // leave group in db
+    await this.service.leaveGroup(socket.userID, groupId);
+    // leave ws-room
+    socket.leave(groupId);
   }
 
   // @SubscribeMessage('joinGroup')
@@ -130,7 +156,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     // check whether current socket is in ws-room with id=data.groupId
     if(!socket.rooms.has(data.groupId)) {
-      throw new WsException('You are not in this group');
+      throw new ForbiddenException('You are not in this group');
     }
 
     // create message in db

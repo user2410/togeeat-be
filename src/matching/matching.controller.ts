@@ -8,18 +8,21 @@ import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } fr
 import { MatchingPaginationDto } from './dto/pagination.dto';
 import { MatchingEntity, MatchingStatus } from './entities/matching.entity';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { ChatService } from '@/chat/chat.service';
 
 
 @Controller('matching')
 @ApiTags('matching')
 export class MatchingController {
-  constructor(private readonly matchingService: MatchingService) { }
+  constructor(
+    private readonly matchingService: MatchingService,
+    private readonly chatService: ChatService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create a new matching record' })
   @ApiCreatedResponse({ type: MatchingEntity })
-  async create(@Request() req, @Body() createMatchingDto: CreateMatchingDto): Promise<MatchingEntity> {
+  async create(@Request() req, @Body() createMatchingDto: CreateMatchingDto) {
     const currentUserId: number = req.user.id;
     const {matchingDate, duration, matchingType} = createMatchingDto;
     if(
@@ -28,13 +31,22 @@ export class MatchingController {
     ) {
       throw new BadRequestException({message: 'Missing duration or matching date'});
     }
-    if (duration && duration < 0) {
-      throw new BadRequestException({ message: 'Invalid duration' });
-    }
     if (matchingDate && matchingDate.valueOf() < (new Date()).valueOf()) {
       throw new BadRequestException({ message: 'Invalid matching date' });
     }
-    return this.matchingService.create(currentUserId, createMatchingDto);
+
+    const newMatching = await this.matchingService.create(currentUserId, createMatchingDto);
+    
+    // create a group chat with name = `matching_group_${matching.id}`
+    const newGroup = await this.chatService.createGroup(currentUserId, {
+      name: `matching_group_${newMatching.id}`,
+      isGroup: true,
+      members: [],
+    });
+    return  {
+      ...newMatching,
+      group: newGroup,
+    };
   }
 
   @Get()
@@ -43,7 +55,7 @@ export class MatchingController {
   @ApiQuery({ name: 'matchAfter', type: 'string', required: false, description: 'standard Date.toISOString() string'})
   @ApiQuery({ name: 'createdBefore', type: 'string', required: false, description: 'standard Date.toISOString() string'})
   @ApiQuery({ name: 'createdAfter', type: 'string', required: false, description: 'standard Date.toISOString() string'})
-  @ApiQuery({name: 'status', enum: MatchingStatus, required: false, description: 'status of matching, if not provided all satisfied matchings is retrieved'})
+  @ApiQuery({name: 'status', enum: MatchingStatus, required: false, description: 'status of matching'})
   @ApiOperation({ summary: 'List all matching records, response is paginated. Filter matchings' })
   @ApiOkResponse({ type: [MatchingPaginationDto] })
   @UsePipes(SearchQueryPipe)
@@ -73,6 +85,30 @@ export class MatchingController {
     return this.matchingService.searchMatchingMembersByName(currentUserId, memberName);
   }
 
+  @Get('group')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get group chat of matching with id' })
+  @ApiOkResponse()
+  async getGroupOfMatching(@Request() req, @Query('id') matchingId: string) {
+    const currentUserId: number = req.user.id;
+    if(!matchingId) {
+      throw new BadRequestException({message: 'Missing matching id'})
+    }
+    const matching = await this.matchingService.findOne(+matchingId);
+    if(!matching) {
+      throw new NotFoundException({message: 'Matching not found'});
+    }
+    const res = await this.chatService.searchGroup({
+      name: `matching_group_${matching.id}`,
+      isGroup: true,
+      exact: true,
+    });
+    if(res.count == 0) {
+      throw new NotFoundException({message: 'Group not found'});
+    }
+    return res.items[0];
+  }    
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a matching by id' })
   @ApiOkResponse({ type: MatchingEntity })
@@ -95,7 +131,18 @@ export class MatchingController {
   @ApiOperation({ summary: 'Join current user to matching with id' })
   @ApiOkResponse()
   async joinMatching(@Request() req, @Param('id') id: string) {
-    return await this.matchingService.joinUser(+id, req.user.id);
+    await this.matchingService.joinUser(+id, req.user.id);
+
+    // join user to matching group chat
+    const res = await this.chatService.searchGroup({
+      name: `matching_group_${id}`,
+      isGroup: true,
+      exact: true,
+    });
+    if(res.count === 0) {
+      return;
+    }
+    await this.chatService.joinGroup(req.user.id, res.items[0].id);
   }
 
   @Patch('/leave/:id')
@@ -108,19 +155,33 @@ export class MatchingController {
     if (!matching) {
       throw new NotFoundException();
     }
+
+    // get corresponding chat room id
+    const searchChatGroupRes = await this.chatService.searchGroup({
+      name: `matching_group_${id}`,
+      isGroup: true,
+      exact: true,
+    });
+    
     // matching owner removes member from matching
     if (currentUserId === matching.ownerId) {
       const uid = +userId;
       if (!uid) {
         throw new BadRequestException('missing member id');
       }
-      this.matchingService.removeUser(+id, uid);
+      await this.matchingService.removeUser(+id, uid);
+
+      if(searchChatGroupRes.count > 0) {
+        await this.chatService.leaveGroup(uid, searchChatGroupRes.items[0].id);
+      }
       return;
     }
     // a member leaves
-    this.matchingService.removeUser(+id, currentUserId);
-
-    throw new ForbiddenException('not allowed operation');
+    await this.matchingService.removeUser(+id, currentUserId);
+    // leave group chat
+    if(searchChatGroupRes.count > 0) {
+      await this.chatService.leaveGroup(currentUserId, searchChatGroupRes.items[0].id);
+    }
   }
 
   @Delete(':id')
@@ -136,6 +197,17 @@ export class MatchingController {
     if (matching.ownerId !== currentUserId) {
       throw new ForbiddenException('not allowed operation');
     }
+
+    // delete group chat
+    const searchChatGroupRes = await this.chatService.searchGroup({
+      name: `matching_group_${id}`,
+      isGroup: true,
+      exact: true,
+    });
+    if(searchChatGroupRes.count > 0) {
+      await this.chatService.deleteGroup(searchChatGroupRes.items[0].id);
+    }
+
     return await this.matchingService.remove(+id);
   }
 }

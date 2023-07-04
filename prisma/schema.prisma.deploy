@@ -34,7 +34,8 @@ model UserInformation {
   hobbies        UserHobby[]
   seenMessages   UserSeenMessages[]
   messages       Message[]
-  groups         Group[]
+  ownedGroups    Group[]            @relation("owner_groups")
+  usersGroups    UserGroup[]
 
   @@map("user_information")
 }
@@ -128,16 +129,29 @@ model Hobby {
 
 model Group {
   id            String   @id @default(dbgenerated("(gen_random_uuid()::TEXT)")) @db.Uuid
+  ownerId       Int      @map(name: "owner_id")
   createdAt     DateTime @default(now())
   lastMessageAt DateTime @default(now()) @map(name: "last_message_at")
   name          String?
   isGroup       Boolean  @default(false) @map(name: "is_group")
 
-  messages   Message[]
-  users      UserInformation[]
+  owner       UserInformation @relation("owner_groups", fields: [ownerId], references: [id], onDelete: Cascade)
+  messages    Message[]
+  usersGroups UserGroup[]
 
-  @@map("groups")
   @@index(fields: [createdAt])
+  @@index(fields: [name])
+  @@map("groups")
+}
+
+model UserGroup {
+  groupId String          @map("group_id") @db.Uuid
+  userId  Int             @map("user_id")
+  group   Group           @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user    UserInformation @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, userId])
+  @@map(name: "users_groups")
 }
 
 enum MessageType {
@@ -158,8 +172,8 @@ model Message {
   groups      Group              @relation(fields: [groupId], references: [id], onDelete: Cascade)
   seenUsers   UserSeenMessages[]
 
-  @@map(name: "messages")
   @@index(fields: [createdAt])
+  @@map(name: "messages")
 }
 
 model UserSeenMessages {
