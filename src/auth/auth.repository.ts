@@ -2,6 +2,7 @@ import { PrismaService } from "@/prisma/prisma.service";
 import { Injectable } from "@nestjs/common";
 import { CreateAccountDto } from "./dto/create-account.dto";
 import { AccountEntity } from "./entity/auth.entity";
+import { defaultSelectedUserInfo } from "@/users/dto/default-selected-info";
 
 @Injectable()
 export class AuthRepository {
@@ -18,7 +19,9 @@ export class AuthRepository {
 	async findById(id: number): Promise<AccountEntity | null> {
 		return await this.prisma.account.findFirst({
 			where: { id },
-			include: { user: true }
+			include: { user: {
+        select: defaultSelectedUserInfo
+      } }
 		});
 	}
 
