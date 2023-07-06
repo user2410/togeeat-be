@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { ReviewRepository } from './review.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { SearchQueryDto } from '@/common/pipes/search-query.pipe';
@@ -11,6 +11,9 @@ export class ReviewService extends SearchingService {
   }
 
   async create(userId: number, data: CreateReviewDto) {
+    if(userId === data.user2Id) {
+      throw new ConflictException('Not allowed to review yourself');
+    }
     return await this.repository.create(userId, data);
   }
 
