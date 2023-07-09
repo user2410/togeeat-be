@@ -1,9 +1,11 @@
 # Togeeat backend API
 
 ## Description
+
 Backend API of Togeeat web app
 
 ## Installation
+
 - Install dependencies: `npm install` or `yarn install`
 - Make a copy of .env.example: `cp .env.example .env`
 - Fill environment variables in '.env' file
@@ -11,8 +13,9 @@ Backend API of Togeeat web app
 - Run `npx prisma migrate dev` or `yarn prisma migrate dev` to apply migrations
 
 ## Build docker image
-- Make a copy of .env.example: `cp .env.example .env`
-- Fill environment variables in '.env' file
+
+- Make a copy of `.env.example` : `cp .env.example .env`
+- Fill environment variables in the `.env` file
 - Build services `docker-compose --env-file .env build`
 - Run services `docker-compose --env-file .env up`
 
@@ -41,4 +44,3 @@ $ yarn run test:e2e
 # test coverage
 $ yarn run test:cov
 ```
-
